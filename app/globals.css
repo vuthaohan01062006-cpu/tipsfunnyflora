@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --tiffany-blue: #0ABAB5;
+  --text-dark: #2D3748;
+}
+
+body {
+  color: var(--text-dark);
+  background-color: #F9FAF8;
+}
