@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { Coffee, Heart, Gift, BookOpen, Send, ShoppingCart } from "lucide-react";
 
