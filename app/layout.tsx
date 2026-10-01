@@ -7,8 +7,8 @@ import Footer from "@/components/layout/Footer";
 const inter = Inter({ subsets: ["latin", "vietnamese"] });
 
 export const metadata: Metadata = {
-  title: "Tips Funny Flora | Hoa Tươi Mới 100% – Đặt Trước 4 Giờ",
-  description: "Tiệm hoa Tips Funny - Chuyên các dòng hoa thiết kế, hoa pre-order 4 tiếng. Cam kết hoa tươi mới 100%.",
+  title: "Treat Sweet Macaron | Small Treat, Sweet Day",
+  description: "Phần thưởng ngọt ngào xoa dịu những nhọc nhằn, gói ghém hương vị thủ công chuẩn Pháp trên tay bạn.",
 };
 
 export default function RootLayout({
