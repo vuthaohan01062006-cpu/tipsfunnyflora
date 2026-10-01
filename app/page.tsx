@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Coffee, Heart, Gift, BookOpen, Send } from "lucide-react";
+import { Coffee, Heart, Gift, BookOpen, Send, ShoppingCart } from "lucide-react";
 
 export default function Home() {
   return (
