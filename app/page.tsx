@@ -126,7 +126,7 @@ export default function Home() {
             {/* Form */}
             <div className="bg-white p-8 rounded-3xl shadow-xl text-brand-choco">
               <h3 className="text-2xl font-bold mb-6 text-center">Gửi Yêu Cầu Đặt Quà</h3>
-              <form className="space-y-4" onSubmit={e => e.preventDefault()}>
+              <form className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">Tên của bạn</label>
