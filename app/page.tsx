@@ -1,109 +1,159 @@
 import Link from "next/link";
-import { Clock, Heart, Camera, Gift } from "lucide-react";
+import { Coffee, Heart, Gift, BookOpen, Send } from "lucide-react";
 
 export default function Home() {
   return (
     <>
-      {/* Hero Banner */}
-      <section className="bg-tiffany-light/10 py-20 px-4 text-center">
-        <div className="container mx-auto max-w-4xl">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-            Hoa Tươi Mới 100% – Đặt Trước 4 Giờ, <span className="text-tiffany">Niềm Vui Nhân Đôi!</span>
+      {/* Hero Section */}
+      <section className="bg-brand-vanilla py-24 px-4 text-center relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10 flex items-center justify-center">
+          <div className="w-[600px] h-[600px] bg-brand-taro rounded-full blur-3xl"></div>
+        </div>
+        <div className="container mx-auto max-w-4xl relative z-10">
+          <h1 className="text-5xl md:text-6xl font-bold text-brand-choco mb-6 leading-tight font-serif">
+            Small Treat, <span className="text-brand text-6xl">Sweet Day</span>
           </h1>
-          <p className="text-lg text-gray-600 mb-10 max-w-2xl mx-auto">
-            Mỗi bông hoa nhập mới theo từng đơn đặt. Cam kết không hoa tồn kho, trọn vẹn từng khoảnh khắc.
+          <p className="text-lg text-brand-choco/80 mb-10 max-w-2xl mx-auto">
+            Phần thưởng ngọt ngào xoa dịu những nhọc nhằn, gói ghém hương vị thủ công chuẩn Pháp trên tay bạn.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/products" className="bg-tiffany text-white px-8 py-3 rounded-full font-semibold hover:bg-tiffany-dark transition-colors">
-              Xem Mẫu Bán Chạy
+            <Link href="#flavors" className="bg-brand text-white px-8 py-3 rounded-full font-medium hover:bg-brand-dark transition-colors shadow-sm">
+              Khám phá 7 nốt hương vị
             </Link>
-            <Link href="/collection/funny-special" className="bg-white text-tiffany border border-tiffany px-8 py-3 rounded-full font-semibold hover:bg-gray-50 transition-colors">
-              Khám Phá Bộ Sưu Tập Funny
+            <Link href="#custom" className="bg-white text-brand-choco border border-brand-choco/20 px-8 py-3 rounded-full font-medium hover:bg-brand-choco hover:text-white transition-colors">
+              Đặt hộp quà custom
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Trust Badge Bar */}
-      <section className="border-y border-gray-100 bg-white py-6">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-            <div className="flex flex-col items-center justify-center p-4">
-              <Clock className="text-tiffany mb-3" size={32} />
-              <h3 className="font-semibold text-gray-900 mb-1">Pre-order tối thiểu 4H</h3>
-              <p className="text-sm text-gray-500">Nhập hoa mới 100% theo đơn, giữ hoa tươi lâu nhất.</p>
-            </div>
-            <div className="flex flex-col items-center justify-center p-4 border-t md:border-t-0 md:border-l border-gray-100">
-              <Heart className="text-tiffany mb-3" size={32} />
-              <h3 className="font-semibold text-gray-900 mb-1">Thiệp viết tay theo yêu cầu</h3>
-              <p className="text-sm text-gray-500">Hỗ trợ những câu chúc hài hước, độc lạ.</p>
-            </div>
-            <div className="flex flex-col items-center justify-center p-4 border-t md:border-t-0 md:border-l border-gray-100">
-              <Camera className="text-tiffany mb-3" size={32} />
-              <h3 className="font-semibold text-gray-900 mb-1">Chụp hình xác nhận</h3>
-              <p className="text-sm text-gray-500">Khách duyệt mẫu trước khi shipper xuất phát.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Highlight Category: Tips Funny Special */}
-      <section className="py-20 px-4 bg-[#F9FAF8]">
+      {/* Bộ Sưu Tập 7 Vị Bánh */}
+      <section id="flavors" className="py-20 px-4 bg-white">
         <div className="container mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Tips Funny Special</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Những thiết kế độc bản kết hợp sắc màu Tiffany Blue, mang đến yếu tố bất ngờ và hài hước cho người nhận.
-            </p>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-brand-choco mb-4 font-serif">Bộ Sưu Tập Hương Vị</h2>
+            <p className="text-brand-choco/60 max-w-xl mx-auto">Mỗi vị bánh là một lời nhắn nhủ, một cảm xúc được nâng niu. Hãy chọn cho mình một nốt hương đồng điệu.</p>
           </div>
           
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[
+              { id: 1, name: 'Vani Madagascar', desc: 'Ngọt dịu, thanh lịch – Dành cho nốt bình yên.', color: 'bg-[#FDF8E1]' },
+              { id: 2, name: 'Uji Matcha', desc: 'Thanh nhẹ, thoảng đắng – Dành cho lúc cần tĩnh lặng.', color: 'bg-[#D0E3C5]' },
+              { id: 3, name: 'Chanh Vàng', desc: 'Chua thanh sảng khoái – Đánh thức sự tỉnh táo.', color: 'bg-[#FFFACD]' },
+              { id: 4, name: 'Bạc Hà / Mint', desc: 'Mát lành, dịu êm – Xua tan căng thẳng.', color: 'bg-[#C1E1C1]' },
+              { id: 5, name: 'Socola Ganache', desc: 'Đậm đà, béo ấm – Một cái ôm ngọt ngào.', color: 'bg-[#8B5A2B]', textColor: 'text-white' },
+              { id: 6, name: 'Dâu Tây', desc: 'Ngọt chua nhẹ tênh – Năng lượng tươi vui, rạng rỡ.', color: 'bg-[#FFD1DC]' },
+              { id: 7, name: 'Blueberry Mascarpone', desc: 'Béo mịn, chua dịu – Thong thả tận hưởng điểm nhấn.', color: 'bg-[#E1D5E7]' },
+            ].map(flavor => (
+              <div key={flavor.id} className={`${flavor.color} rounded-2xl p-8 flex flex-col justify-between h-64 shadow-sm hover:shadow-md transition-shadow group`}>
+                <div>
+                  <h3 className={`text-xl font-bold ${flavor.textColor || 'text-brand-choco'} mb-3`}>{flavor.name}</h3>
+                  <p className={`${flavor.textColor ? 'text-white/80' : 'text-brand-choco/70'} text-sm leading-relaxed`}>{flavor.desc}</p>
+                </div>
+                <div className="flex justify-end">
+                  <button className={`w-10 h-10 rounded-full flex items-center justify-center ${flavor.textColor ? 'bg-white/20 text-white' : 'bg-white/50 text-brand-choco'} group-hover:scale-110 transition-transform`}>
+                    <ShoppingCart size={18} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Sau Lớp Vỏ (Blog Snippets) */}
+      <section className="py-20 px-4 bg-brand-taro/20">
+        <div className="container mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+            <div>
+              <h2 className="text-3xl font-bold text-brand-choco mb-4 font-serif">Sau Lớp Vỏ</h2>
+              <p className="text-brand-choco/60">Những câu chuyện mộc mạc phía sau kỹ thuật làm bánh thủ công chuẩn Pháp.</p>
+            </div>
+            <Link href="/blog" className="text-brand font-medium hover:underline mt-4 md:mt-0 flex items-center">
+              Xem tất cả bài viết <BookOpen size={16} className="ml-2"/>
+            </Link>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Product Card 1 */}
-            <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
-              <div className="h-64 bg-gray-200 relative flex items-center justify-center">
-                <Gift className="text-gray-400" size={48} />
-              </div>
-              <div className="p-6">
-                <div className="text-tiffany text-xs font-bold tracking-wider mb-2 uppercase">Signature</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-tiffany transition-colors">Bó Hoa Ôm Gấu (Huggy Bloom)</h3>
-                <p className="text-gray-500 text-sm mb-4 line-clamp-2">Bó hoa tone pastel hoặc xanh Tiffany, ở trung tâm là một chú gấu bông mini đang ôm chặt bông hoa chính hoặc bảng thông điệp.</p>
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-lg text-gray-900">450.000đ</span>
-                  <Link href="/products/huggy-bloom" className="text-tiffany font-medium hover:underline text-sm">Đặt ngay</Link>
-                </div>
-              </div>
-            </div>
+            <article className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow p-6">
+              <span className="text-brand text-xs font-bold tracking-wider mb-2 block uppercase">Sự thật / Kỹ thuật</span>
+              <h3 className="text-lg font-bold text-brand-choco mb-3">Vì sao macaron có giá thành tương đương một ly cà phê đặc sản?</h3>
+              <p className="text-sm text-gray-500 mb-4 line-clamp-3">Cùng giải mã việc sử dụng 100% bột hạnh nhân nguyên chất thay vì pha trộn, và kỹ thuật tạo chân bánh (pied) đỏng đảnh của nghệ nhân...</p>
+              <Link href="#" className="text-brand-choco text-sm font-medium hover:text-brand">Đọc tiếp &rarr;</Link>
+            </article>
+            <article className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow p-6">
+              <span className="text-brand text-xs font-bold tracking-wider mb-2 block uppercase">Hương vị</span>
+              <h3 className="text-lg font-bold text-brand-choco mb-3">Phá bỏ hiểu lầm bánh ngọt gắt: Bí quyết cân bằng vị với ganache</h3>
+              <p className="text-sm text-gray-500 mb-4 line-clamp-3">Macaron không hề gắt nếu phần nhân được làm từ ganache mộc bản thay vì kem bơ béo ngậy. Sự cân bằng độ chua - đắng - ngọt...</p>
+              <Link href="#" className="text-brand-choco text-sm font-medium hover:text-brand">Đọc tiếp &rarr;</Link>
+            </article>
+            <article className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow p-6">
+              <span className="text-brand text-xs font-bold tracking-wider mb-2 block uppercase">Trải nghiệm</span>
+              <h3 className="text-lg font-bold text-brand-choco mb-3">Quy tắc 10 phút vàng: Cách bảo quản và thưởng thức macaron trọn vị</h3>
+              <p className="text-sm text-gray-500 mb-4 line-clamp-3">Để vỏ bánh giòn tan và nhân lạnh tan chảy hoàn hảo trên đầu lưỡi, hãy để bánh nghỉ 10 phút sau khi lấy khỏi tủ lạnh...</p>
+              <Link href="#" className="text-brand-choco text-sm font-medium hover:text-brand">Đọc tiếp &rarr;</Link>
+            </article>
+          </div>
+        </div>
+      </section>
 
-            {/* Product Card 2 */}
-            <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
-              <div className="h-64 bg-gray-200 relative flex items-center justify-center">
-                <Gift className="text-gray-400" size={48} />
-              </div>
-              <div className="p-6">
-                <div className="text-tiffany text-xs font-bold tracking-wider mb-2 uppercase">Viral Marketing</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-tiffany transition-colors">Hộp Hoa Mù (Blind Box Flower)</h3>
-                <p className="text-gray-500 text-sm mb-4 line-clamp-2">Hộp hoa bí mật kết hợp một hộp quà mù (Blind box/Art toy) giấu khéo léo bên trong các tầng hoa tươi.</p>
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-lg text-gray-900">650.000đ</span>
-                  <Link href="/products/blind-box-flower" className="text-tiffany font-medium hover:underline text-sm">Đặt ngay</Link>
-                </div>
-              </div>
+      {/* Custom & Gift Box (Campaign Together) */}
+      <section id="custom" className="py-20 px-4 bg-brand-choco text-brand-vanilla">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-4xl font-bold mb-6 font-serif">Custom & Gift Box</h2>
+              <p className="text-white/80 mb-8 leading-relaxed">
+                Biến những chiếc bánh thành món quà thay lời muốn nói. Chúng tôi cung cấp dịch vụ vẽ hình hoạt hình, ghi thông điệp lên vỏ bánh, hoặc thiết kế set quà tặng thiết kế riêng cho những dịp đặc biệt.
+              </p>
+              
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-start">
+                  <Heart className="text-brand shrink-0 mr-3 mt-1" size={20} />
+                  <span><strong>Hộp quà tỏ tình "Be Your Mind":</strong> Thiết kế mix màu theo tone lãng mạn.</span>
+                </li>
+                <li className="flex items-start">
+                  <Gift className="text-brand shrink-0 mr-3 mt-1" size={20} />
+                  <span><strong>Macaron vẽ hình:</strong> Vẽ nhân vật hoạt hình hoặc chibi bằng tay.</span>
+                </li>
+                <li className="flex items-start">
+                  <Coffee className="text-brand shrink-0 mr-3 mt-1" size={20} />
+                  <span><strong>Combo Tea & Macaron:</strong> Gói ghém cùng trà Anh cao cấp cho cuối tuần thư giãn.</span>
+                </li>
+              </ul>
             </div>
-
-            {/* Product Card 3 */}
-            <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
-              <div className="h-64 bg-gray-200 relative flex items-center justify-center">
-                <Gift className="text-gray-400" size={48} />
-              </div>
-              <div className="p-6">
-                <div className="text-tiffany text-xs font-bold tracking-wider mb-2 uppercase">Trending</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-tiffany transition-colors">Bó Hoa Tự Chữa Lành</h3>
-                <p className="text-gray-500 text-sm mb-4 line-clamp-2">Bó hoa nhỏ gọn đính kèm một chiếc lọ thủy tinh chứa 30 lá thư cuộn nhỏ (Mỗi lá thư là một câu quote hài hước / động viên).</p>
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-lg text-gray-900">250.000đ</span>
-                  <Link href="/products/emergency-smile" className="text-tiffany font-medium hover:underline text-sm">Đặt ngay</Link>
+            
+            {/* Form */}
+            <div className="bg-white p-8 rounded-3xl shadow-xl text-brand-choco">
+              <h3 className="text-2xl font-bold mb-6 text-center">Gửi Yêu Cầu Đặt Quà</h3>
+              <form className="space-y-4" onSubmit={e => e.preventDefault()}>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Tên của bạn</label>
+                    <input type="text" className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Số điện thoại</label>
+                    <input type="text" className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand" />
+                  </div>
                 </div>
-              </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Chọn gói quà</label>
+                  <select className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand">
+                    <option>Hộp quà tỏ tình "Be Your Mind"</option>
+                    <option>Hộp 6 bánh Macaron vẽ hình custom</option>
+                    <option>Combo Tea & Macaron cao cấp</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Lời nhắn đính kèm thiệp</label>
+                  <textarea rows={3} className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand resize-none" placeholder="Những lời yêu thương..."></textarea>
+                </div>
+                <button type="submit" className="w-full bg-brand text-white font-bold py-3 rounded-xl hover:bg-brand-dark transition-colors flex justify-center items-center">
+                  Gửi yêu cầu tư vấn <Send size={18} className="ml-2" />
+                </button>
+                <p className="text-xs text-center text-gray-500 mt-2">Hoặc inbox trực tiếp qua Fanpage để được hỗ trợ nhanh nhất.</p>
+              </form>
             </div>
           </div>
         </div>
