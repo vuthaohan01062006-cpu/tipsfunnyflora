@@ -8,12 +8,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        tiffany: {
-          DEFAULT: '#0ABAB5',
-          light: '#33C4C0',
-          dark: '#08968F',
+        brand: {
+          DEFAULT: '#E8A0BF',
+          dark: '#D78BAA',
+          vanilla: '#FDF8E1',
+          matcha: '#D0E3C5',
+          taro: '#E1D5E7',
+          choco: '#8B5A2B',
+          mint: '#C1E1C1',
+          lemon: '#FFFACD',
+          berry: '#FFD1DC'
         },
-        primary: '#0ABAB5',
       },
     },
   },
