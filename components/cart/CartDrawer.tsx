@@ -95,7 +95,7 @@ export default function CartDrawer() {
                       {item.name}
                     </h4>
                     <p className="text-xs text-brand font-semibold mt-0.5">
-                      {item.priceString}
+                      {item.price} {item.priceUnit ? `/ ${item.priceUnit}` : ""}
                     </p>
 
                     {/* Quantity Selector */}

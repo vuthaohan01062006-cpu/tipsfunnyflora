@@ -6,6 +6,7 @@ export interface CartItem {
   id: string | number;
   name: string;
   price: string;
+  priceUnit?: string;
   priceNumber: number;
   image?: string;
   color?: string;
@@ -90,6 +91,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           id: product.id,
           name: product.name,
           price: product.price || formatPrice(priceNum),
+          priceUnit: product.priceUnit,
           priceNumber: priceNum,
           image: product.image || "",
           color: product.color || "bg-[#FDF8E1]",

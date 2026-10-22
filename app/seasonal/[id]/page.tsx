@@ -235,10 +235,15 @@ export default function SeasonalProductDetailPage() {
             </h1>
 
             {/* Price with VAT note */}
-            <div className="flex items-baseline gap-2.5 flex-wrap">
+            <div className="flex items-baseline gap-2 flex-wrap">
               <span className="text-2xl sm:text-3xl font-black text-red-600 tracking-tight font-sans">
                 {product.price || "42.000đ"}
               </span>
+              {product.priceUnit && (
+                <span className="text-base sm:text-lg font-bold text-brand-choco/80 font-sans">
+                  / {product.priceUnit}
+                </span>
+              )}
               <span className="text-xs text-gray-500 font-normal">
                 {t("detail.vatNote") || "(Giá chưa bao gồm thuế VAT)"}
               </span>

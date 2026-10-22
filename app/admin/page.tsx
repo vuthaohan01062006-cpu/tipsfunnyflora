@@ -75,6 +75,7 @@ export default function AdminDashboard() {
     name: "",
     desc: "",
     price: "35.000đ",
+    priceUnit: "cái",
     color: "bg-[#FDF8E1]",
     image: "",
     category: "Bộ sưu tập",
@@ -91,6 +92,7 @@ export default function AdminDashboard() {
     seasonTag: "Mùa Thu 🍂",
     desc: "",
     price: "42.000đ",
+    priceUnit: "cái",
     color: "bg-[#FBE8D3]",
     image: "",
     category: "Mùa Thu",
@@ -100,6 +102,7 @@ export default function AdminDashboard() {
   const [showAddSeasonalForm, setShowAddSeasonalForm] = useState(false);
   const [editingSeasonalId, setEditingSeasonalId] = useState<string | number | null>(null);
   const [editSeasonalForm, setEditSeasonalForm] = useState<SeasonalProduct | null>(null);
+  const [galleryUrlInput, setGalleryUrlInput] = useState("");
 
   // Form state for adding new blog post
   const [newBlog, setNewBlog] = useState<Partial<BlogPost>>({
@@ -358,6 +361,33 @@ export default function AdminDashboard() {
         gallery: [base64Url, ...(prev.gallery || []).filter(g => g !== base64Url)]
       } : null);
       showNotification("Đã cập nhật ảnh cho vị bánh đang chỉnh sửa!", "success");
+    } else if (uploadTargetId === "add_gallery_product") {
+      setEditForm(prev => {
+        if (!prev) return null;
+        const currentGallery = prev.gallery || (prev.image ? [prev.image] : []);
+        return {
+          ...prev,
+          gallery: [...currentGallery, base64Url]
+        };
+      });
+      showNotification("Đã thêm 1 ảnh mới vào album ảnh bánh!", "success");
+    } else if (uploadTargetId === "add_gallery_seasonal") {
+      setEditSeasonalForm(prev => {
+        if (!prev) return null;
+        const currentGallery = prev.gallery || (prev.image ? [prev.image] : []);
+        return {
+          ...prev,
+          gallery: [...currentGallery, base64Url]
+        };
+      });
+      showNotification("Đã thêm 1 ảnh mới vào album bánh theo mùa!", "success");
+    } else if (uploadTargetId === "edit_seasonal_image") {
+      setEditSeasonalForm(prev => prev ? {
+        ...prev,
+        image: base64Url,
+        gallery: [base64Url, ...(prev.gallery || []).filter(g => g !== base64Url)]
+      } : null);
+      showNotification("Đã cập nhật ảnh đại diện bánh theo mùa!", "success");
     } else if (uploadTargetId === "edit_blog") {
       setEditBlogForm(prev => prev ? { ...prev, image: base64Url } : null);
       showNotification("Đã cập nhật ảnh bìa cho bài viết đang chỉnh sửa!", "success");
@@ -455,6 +485,7 @@ export default function AdminDashboard() {
       name: newProduct.name.trim(),
       desc: newProduct.desc.trim() || "Hương vị thủ công đặc biệt.",
       price: newProduct.price.trim() || "35.000đ",
+      priceUnit: newProduct.priceUnit || "cái",
       color: newProduct.color,
       textColor: "text-brand-choco",
       image: newProduct.image || "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
@@ -473,6 +504,7 @@ export default function AdminDashboard() {
       name: "",
       desc: "",
       price: "35.000đ",
+      priceUnit: "cái",
       color: "bg-[#FDF8E1]",
       image: "",
       category: "Bộ sưu tập",
@@ -495,6 +527,88 @@ export default function AdminDashboard() {
     setEditForm(null);
   };
 
+  // Gallery helpers for Seasonal Products
+  const handleAddSeasonalGalleryUrl = (url: string) => {
+    if (!url.trim()) return;
+    if (editSeasonalForm) {
+      const currentGallery = editSeasonalForm.gallery || (editSeasonalForm.image ? [editSeasonalForm.image] : []);
+      setEditSeasonalForm({
+        ...editSeasonalForm,
+        gallery: [...currentGallery, url.trim()]
+      });
+      setGalleryUrlInput("");
+      showNotification("Đã thêm ảnh vào album bánh!", "success");
+    }
+  };
+
+  const handleRemoveSeasonalGalleryImg = (index: number) => {
+    if (!editSeasonalForm) return;
+    const current = editSeasonalForm.gallery || (editSeasonalForm.image ? [editSeasonalForm.image] : []);
+    const updated = current.filter((_, idx) => idx !== index);
+    let newMain = editSeasonalForm.image;
+    if (current[index] === editSeasonalForm.image) {
+      newMain = updated[0] || "";
+    }
+    setEditSeasonalForm({
+      ...editSeasonalForm,
+      image: newMain,
+      gallery: updated
+    });
+    showNotification("Đã xóa ảnh khỏi album!", "info");
+  };
+
+  const handleSetSeasonalMainImage = (imgUrl: string) => {
+    if (!editSeasonalForm) return;
+    const currentGallery = editSeasonalForm.gallery || [];
+    setEditSeasonalForm({
+      ...editSeasonalForm,
+      image: imgUrl,
+      gallery: [imgUrl, ...currentGallery.filter(g => g !== imgUrl)]
+    });
+    showNotification("Đã đặt làm ảnh đại diện chính!", "success");
+  };
+
+  // Gallery helpers for Regular Products
+  const handleAddProductGalleryUrl = (url: string) => {
+    if (!url.trim()) return;
+    if (editForm) {
+      const currentGallery = editForm.gallery || (editForm.image ? [editForm.image] : []);
+      setEditForm({
+        ...editForm,
+        gallery: [...currentGallery, url.trim()]
+      });
+      setGalleryUrlInput("");
+      showNotification("Đã thêm ảnh vào album bánh!", "success");
+    }
+  };
+
+  const handleRemoveProductGalleryImg = (index: number) => {
+    if (!editForm) return;
+    const current = editForm.gallery || (editForm.image ? [editForm.image] : []);
+    const updated = current.filter((_, idx) => idx !== index);
+    let newMain = editForm.image;
+    if (current[index] === editForm.image) {
+      newMain = updated[0] || "";
+    }
+    setEditForm({
+      ...editForm,
+      image: newMain,
+      gallery: updated
+    });
+    showNotification("Đã xóa ảnh khỏi album!", "info");
+  };
+
+  const handleSetProductMainImage = (imgUrl: string) => {
+    if (!editForm) return;
+    const currentGallery = editForm.gallery || [];
+    setEditForm({
+      ...editForm,
+      image: imgUrl,
+      gallery: [imgUrl, ...currentGallery.filter(g => g !== imgUrl)]
+    });
+    showNotification("Đã đặt làm ảnh đại diện chính!", "success");
+  };
+
   // ==================== SEASONAL PRODUCT ACTIONS ====================
   const handleAddSeasonal = (e: React.FormEvent) => {
     e.preventDefault();
@@ -509,6 +623,7 @@ export default function AdminDashboard() {
       seasonTag: newSeasonal.seasonTag.trim() || "Mùa Thu 🍂",
       desc: newSeasonal.desc.trim() || "Hương vị bánh ngọt phiên bản giới hạn theo mùa.",
       price: newSeasonal.price.trim() || "42.000đ",
+      priceUnit: newSeasonal.priceUnit || "cái",
       color: newSeasonal.color || "bg-[#FBE8D3]",
       textColor: "text-brand-choco",
       image: newSeasonal.image || "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=85",
@@ -535,6 +650,7 @@ export default function AdminDashboard() {
       seasonTag: "Mùa Thu 🍂",
       desc: "",
       price: "42.000đ",
+      priceUnit: "cái",
       color: "bg-[#FBE8D3]",
       image: "",
       category: "Mùa Thu",
@@ -947,13 +1063,22 @@ export default function AdminDashboard() {
                     onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
                     className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm"
                   />
-                  <input
-                    type="text"
-                    placeholder="Giá niêm yết (VD: 35.000đ)"
-                    value={newProduct.price}
-                    onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
-                    className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm"
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Giá niêm yết (VD: 35.000đ)"
+                      value={newProduct.price}
+                      onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+                      className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Đơn vị (cái, set 4...)"
+                      value={newProduct.priceUnit || ""}
+                      onChange={(e) => setNewProduct({ ...newProduct, priceUnit: e.target.value })}
+                      className="w-40 px-4 py-2.5 rounded-xl border border-gray-200 text-sm"
+                    />
+                  </div>
                   <input
                     type="text"
                     placeholder="Mô tả cảm xúc ngắn"
@@ -1009,7 +1134,9 @@ export default function AdminDashboard() {
                     <div>
                       <div className="flex justify-between items-start">
                         <h4 className="font-bold font-serif text-brand-choco text-lg">{p.name}</h4>
-                        <span className="text-xs font-bold text-brand bg-brand-vanilla px-2 py-1 rounded-md">{p.price || "35.000đ"}</span>
+                        <span className="text-xs font-bold text-brand bg-brand-vanilla px-2 py-1 rounded-md">
+                          {p.price || "35.000đ"} {p.priceUnit ? `/ ${p.priceUnit}` : ""}
+                        </span>
                       </div>
                       <p className="text-xs text-brand-choco/70 line-clamp-2 mt-1">{p.desc}</p>
                     </div>
@@ -1069,10 +1196,42 @@ export default function AdminDashboard() {
                         <label className="block text-xs font-bold text-gray-700 mb-1">Giá niêm yết</label>
                         <input
                           type="text"
+                          placeholder="VD: 35.000đ hoặc 199.000đ"
                           value={editForm.price || "35.000đ"}
                           onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
                           className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brand focus:outline-none"
                         />
+                      </div>
+                    </div>
+
+                    {/* Quy cách / Đơn vị tính */}
+                    <div className="bg-brand-vanilla/40 p-3.5 rounded-2xl border border-brand/20">
+                      <label className="block text-xs font-bold text-brand-choco mb-1">
+                        Quy cách / Đơn vị tính (VD: cái, set 4 bánh, hộp 6 cái...)
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="VD: cái, hộp 4 bánh, set 6 bánh..."
+                        value={editForm.priceUnit || ""}
+                        onChange={(e) => setEditForm({ ...editForm, priceUnit: e.target.value })}
+                        className="w-full px-4 py-2 rounded-xl border border-gray-200 text-sm bg-white focus:border-brand focus:outline-none"
+                      />
+                      <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                        <span className="text-[11px] text-gray-500 mr-1">Gợi ý nhanh:</span>
+                        {["cái", "chiếc", "set 4 bánh", "hộp 4 bánh", "hộp 6 bánh", "set 12 bánh"].map((u) => (
+                          <button
+                            key={u}
+                            type="button"
+                            onClick={() => setEditForm({ ...editForm, priceUnit: u })}
+                            className={`text-xs px-2.5 py-1 rounded-lg border transition-colors cursor-pointer ${
+                              editForm.priceUnit === u
+                                ? "bg-brand text-white border-brand font-bold shadow-xs"
+                                : "bg-white text-gray-700 border-brand/20 hover:bg-brand-vanilla"
+                            }`}
+                          >
+                            {u}
+                          </button>
+                        ))}
                       </div>
                     </div>
 
@@ -1120,7 +1279,7 @@ export default function AdminDashboard() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-gray-700 mb-1">Hình ảnh bánh</label>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Hình ảnh đại diện chính</label>
                       <div className="flex gap-2">
                         <input
                           type="text"
@@ -1141,11 +1300,82 @@ export default function AdminDashboard() {
                         <div className="mt-3 flex items-center gap-3 p-3 bg-brand-vanilla/40 rounded-2xl border border-brand/20">
                           <img src={editForm.image} alt="Xem trước" className="w-16 h-16 rounded-xl object-cover" />
                           <div className="text-xs text-gray-600">
-                            <span className="font-bold text-brand-choco block">Xem trước ảnh bánh</span>
-                            <span>Ảnh sẽ hiển thị sắc nét ngoài trang bộ sưu tập và trang chi tiết sản phẩm</span>
+                            <span className="font-bold text-brand-choco block">Xem trước ảnh đại diện</span>
+                            <span>Ảnh sẽ hiển thị ngoài trang bộ sưu tập và ảnh chính trang chi tiết</span>
                           </div>
                         </div>
                       )}
+                    </div>
+
+                    {/* Quản lý Album ảnh chi tiết (Thêm / Xóa / Đặt làm ảnh chính) */}
+                    <div className="bg-[#FAF7F2] p-4 rounded-2xl border border-brand/20 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <label className="block text-xs font-bold text-brand-choco">
+                            Thư viện album ảnh ({((editForm.gallery && editForm.gallery.length > 0) ? editForm.gallery : (editForm.image ? [editForm.image] : [])).length} ảnh)
+                          </label>
+                          <span className="text-[11px] text-gray-500">
+                            Hiển thị ở cột thumbnail trượt bên trái trang chi tiết sản phẩm.
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => triggerImageUpload("add_gallery_product")}
+                          className="px-3.5 py-2 bg-brand hover:bg-brand-dark text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer transition-colors"
+                        >
+                          <Plus size={14} /> Thêm ảnh từ máy
+                        </button>
+                      </div>
+
+                      {/* Danh sách ảnh hiện tại */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {((editForm.gallery && editForm.gallery.length > 0) ? editForm.gallery : (editForm.image ? [editForm.image] : [])).map((imgUrl, idx) => (
+                          <div key={idx} className="relative group/thumb aspect-square rounded-xl overflow-hidden border-2 bg-white shadow-xs">
+                            <img src={imgUrl} alt={`Ảnh ${idx + 1}`} className="w-full h-full object-cover" />
+                            {imgUrl === editForm.image && (
+                              <span className="absolute top-1 left-1 bg-brand text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">
+                                Ảnh chính
+                              </span>
+                            )}
+                            <div className="absolute inset-0 bg-black/65 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5 p-1">
+                              {imgUrl !== editForm.image && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleSetProductMainImage(imgUrl)}
+                                  className="text-[10px] text-white bg-brand hover:bg-brand-dark px-2 py-1 rounded-md font-bold cursor-pointer"
+                                >
+                                  Đặt làm ảnh chính
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveProductGalleryImg(idx)}
+                                className="text-[10px] text-white bg-red-600 hover:bg-red-700 px-2 py-1 rounded-md font-bold flex items-center gap-1 cursor-pointer"
+                              >
+                                <Trash2 size={11} /> Xóa ảnh
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Thêm ảnh bằng URL */}
+                      <div className="flex gap-2 pt-1">
+                        <input
+                          type="text"
+                          placeholder="Hoặc dán URL ảnh vào đây để thêm vào album..."
+                          value={galleryUrlInput}
+                          onChange={(e) => setGalleryUrlInput(e.target.value)}
+                          className="flex-1 px-3 py-2 rounded-xl border border-gray-200 text-xs bg-white focus:border-brand focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleAddProductGalleryUrl(galleryUrlInput)}
+                          className="px-3.5 py-2 bg-white border border-brand/30 hover:bg-brand-vanilla text-brand-choco rounded-xl text-xs font-bold cursor-pointer"
+                        >
+                          + Thêm link
+                        </button>
+                      </div>
                     </div>
 
                     <div>
@@ -1259,11 +1489,38 @@ export default function AdminDashboard() {
                     <label className="block text-xs font-bold text-gray-700 mb-1">Giá bán niêm yết</label>
                     <input
                       type="text"
-                      placeholder="VD: 42.000đ"
+                      placeholder="VD: 42.000đ hoặc 199.000đ"
                       value={newSeasonal.price}
                       onChange={(e) => setNewSeasonal({ ...newSeasonal, price: e.target.value })}
                       className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none"
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Quy cách / Đơn vị tính</label>
+                    <input
+                      type="text"
+                      placeholder="VD: cái, set 4 bánh, hộp 6 bánh..."
+                      value={newSeasonal.priceUnit}
+                      onChange={(e) => setNewSeasonal({ ...newSeasonal, priceUnit: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none"
+                    />
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      {["cái", "chiếc", "set 4 bánh", "hộp 4 bánh", "hộp 6 bánh", "set 12 bánh"].map((u) => (
+                        <button
+                          key={u}
+                          type="button"
+                          onClick={() => setNewSeasonal({ ...newSeasonal, priceUnit: u })}
+                          className={`text-[10px] px-2 py-0.5 rounded-md border transition-colors cursor-pointer ${
+                            newSeasonal.priceUnit === u
+                              ? "bg-amber-600 text-white border-amber-600 font-bold"
+                              : "bg-white text-gray-600 border-amber-200 hover:bg-amber-50"
+                          }`}
+                        >
+                          {u}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   <div>
@@ -1401,7 +1658,7 @@ export default function AdminDashboard() {
                       <div className="flex justify-between items-start gap-2">
                         <h4 className="font-bold font-serif text-brand-choco text-base line-clamp-1">{s.name}</h4>
                         <span className="text-xs font-black text-red-600 font-sans bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200/60 shrink-0">
-                          {s.price || "42.000đ"}
+                          {s.price || "42.000đ"} {s.priceUnit ? `/ ${s.priceUnit}` : ""}
                         </span>
                       </div>
                       <p className="text-xs text-brand-choco/70 line-clamp-2 mt-1.5 leading-relaxed">{s.desc}</p>
@@ -1479,13 +1736,45 @@ export default function AdminDashboard() {
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-gray-700 mb-1">Giá bán</label>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">Giá bán niêm yết</label>
                         <input
                           type="text"
+                          placeholder="VD: 42.000đ hoặc 199.000đ"
                           value={editSeasonalForm.price}
                           onChange={(e) => setEditSeasonalForm({ ...editSeasonalForm, price: e.target.value })}
                           className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none"
                         />
+                      </div>
+                    </div>
+
+                    {/* Quy cách / Đơn vị tính */}
+                    <div className="bg-amber-50/60 p-3.5 rounded-2xl border border-amber-200/60">
+                      <label className="block text-xs font-bold text-amber-900 mb-1">
+                        Quy cách / Đơn vị tính (VD: cái, set 4 bánh, hộp 6 cái...)
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="VD: cái, set 4 bánh, hộp 6 bánh..."
+                        value={editSeasonalForm.priceUnit || ""}
+                        onChange={(e) => setEditSeasonalForm({ ...editSeasonalForm, priceUnit: e.target.value })}
+                        className="w-full px-4 py-2 rounded-xl border border-gray-200 text-sm bg-white focus:border-amber-500 focus:outline-none"
+                      />
+                      <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                        <span className="text-[11px] text-gray-500 mr-1">Gợi ý nhanh:</span>
+                        {["cái", "chiếc", "set 4 bánh", "hộp 4 bánh", "hộp 6 bánh", "set 12 bánh"].map((u) => (
+                          <button
+                            key={u}
+                            type="button"
+                            onClick={() => setEditSeasonalForm({ ...editSeasonalForm, priceUnit: u })}
+                            className={`text-xs px-2.5 py-1 rounded-lg border transition-colors cursor-pointer ${
+                              editSeasonalForm.priceUnit === u
+                                ? "bg-amber-600 text-white border-amber-600 font-bold shadow-xs"
+                                : "bg-white text-gray-700 border-amber-200 hover:bg-amber-100"
+                            }`}
+                          >
+                            {u}
+                          </button>
+                        ))}
                       </div>
                     </div>
 
@@ -1510,20 +1799,101 @@ export default function AdminDashboard() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-gray-700 mb-1">Link ảnh đại diện</label>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Hình ảnh đại diện chính</label>
                       <div className="flex gap-2">
                         <input
                           type="text"
                           value={editSeasonalForm.image || ""}
                           onChange={(e) => setEditSeasonalForm({ ...editSeasonalForm, image: e.target.value })}
+                          placeholder="Link ảnh hoặc bấm Tải ảnh từ máy"
                           className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none"
                         />
                         <button
                           type="button"
-                          onClick={() => triggerImageUpload(`seasonal_${editSeasonalForm.id}`)}
-                          className="px-3 py-2 bg-amber-100 text-amber-900 rounded-xl text-xs font-bold cursor-pointer"
+                          onClick={() => triggerImageUpload("edit_seasonal_image")}
+                          className="px-4 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-xl text-xs font-bold cursor-pointer transition-colors flex items-center gap-1.5 shrink-0"
                         >
-                          Tải ảnh
+                          <Upload size={14} /> Tải ảnh từ máy
+                        </button>
+                      </div>
+                      {editSeasonalForm.image && (
+                        <div className="mt-3 flex items-center gap-3 p-3 bg-amber-50/60 rounded-2xl border border-amber-200/60">
+                          <img src={editSeasonalForm.image} alt="Xem trước" className="w-16 h-16 rounded-xl object-cover" />
+                          <div className="text-xs text-gray-600">
+                            <span className="font-bold text-amber-900 block">Xem trước ảnh đại diện</span>
+                            <span>Ảnh này hiển thị ngoài trang danh mục và ảnh chính trang chi tiết</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Quản lý Album ảnh chi tiết (Thêm / Xóa / Đặt làm ảnh chính) */}
+                    <div className="bg-[#FAF7F2] p-4 rounded-2xl border border-amber-200/80 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <label className="block text-xs font-bold text-amber-900">
+                            Thư viện album ảnh ({((editSeasonalForm.gallery && editSeasonalForm.gallery.length > 0) ? editSeasonalForm.gallery : (editSeasonalForm.image ? [editSeasonalForm.image] : [])).length} ảnh)
+                          </label>
+                          <span className="text-[11px] text-gray-500">
+                            Hiển thị ở cột thumbnail trượt bên trái trang chi tiết bánh theo mùa.
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => triggerImageUpload("add_gallery_seasonal")}
+                          className="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer transition-colors"
+                        >
+                          <Plus size={14} /> Thêm ảnh từ máy
+                        </button>
+                      </div>
+
+                      {/* Danh sách ảnh hiện tại */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {((editSeasonalForm.gallery && editSeasonalForm.gallery.length > 0) ? editSeasonalForm.gallery : (editSeasonalForm.image ? [editSeasonalForm.image] : [])).map((imgUrl, idx) => (
+                          <div key={idx} className="relative group/thumb aspect-square rounded-xl overflow-hidden border-2 bg-white shadow-xs">
+                            <img src={imgUrl} alt={`Ảnh ${idx + 1}`} className="w-full h-full object-cover" />
+                            {imgUrl === editSeasonalForm.image && (
+                              <span className="absolute top-1 left-1 bg-amber-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">
+                                Ảnh chính
+                              </span>
+                            )}
+                            <div className="absolute inset-0 bg-black/65 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5 p-1">
+                              {imgUrl !== editSeasonalForm.image && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleSetSeasonalMainImage(imgUrl)}
+                                  className="text-[10px] text-white bg-amber-600 hover:bg-amber-700 px-2 py-1 rounded-md font-bold cursor-pointer"
+                                >
+                                  Đặt làm ảnh chính
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveSeasonalGalleryImg(idx)}
+                                className="text-[10px] text-white bg-red-600 hover:bg-red-700 px-2 py-1 rounded-md font-bold flex items-center gap-1 cursor-pointer"
+                              >
+                                <Trash2 size={11} /> Xóa ảnh
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Thêm ảnh bằng URL */}
+                      <div className="flex gap-2 pt-1">
+                        <input
+                          type="text"
+                          placeholder="Hoặc dán URL ảnh vào đây để thêm vào album..."
+                          value={galleryUrlInput}
+                          onChange={(e) => setGalleryUrlInput(e.target.value)}
+                          className="flex-1 px-3 py-2 rounded-xl border border-gray-200 text-xs bg-white focus:border-amber-500 focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleAddSeasonalGalleryUrl(galleryUrlInput)}
+                          className="px-3.5 py-2 bg-white border border-amber-300 hover:bg-amber-100 text-amber-900 rounded-xl text-xs font-bold cursor-pointer"
+                        >
+                          + Thêm link
                         </button>
                       </div>
                     </div>

@@ -237,8 +237,15 @@ export default function ProductDetailPage() {
 
             {/* Price & VAT (Large Red Font + Subtext) */}
             <div className="mb-6">
-              <div className="text-3xl md:text-4xl font-extrabold text-[#BA3826] font-serif">
-                {product.price ? product.price.replace("đ", "VND") : "35,000VND"}
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <span className="text-3xl md:text-4xl font-extrabold text-[#BA3826] font-serif">
+                  {product.price ? product.price.replace("đ", "VND") : "35,000VND"}
+                </span>
+                {product.priceUnit && (
+                  <span className="text-base sm:text-lg font-bold text-brand-choco/80 font-sans">
+                    / {product.priceUnit}
+                  </span>
+                )}
               </div>
               <div className="text-xs font-bold text-[#BA3826] mt-0.5">
                 {t("detail.vatNote")}

@@ -3,6 +3,7 @@ export interface SeasonalProduct {
   name: string;
   desc: string;
   price: string;
+  priceUnit?: string; // e.g. "cái", "set 4 bánh", "hộp 6 bánh", "hộp 12 bánh"...
   color: string;
   textColor?: string;
   image?: string;

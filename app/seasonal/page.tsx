@@ -237,9 +237,16 @@ export default function SeasonalPage() {
                   {/* Price Row */}
                   <div className="mt-4 pt-3 border-t border-gray-100 flex items-baseline justify-between">
                     <div>
-                      <span className="text-lg font-black text-red-600 font-sans tracking-tight">
-                        {flavor.price || "42.000đ"}
-                      </span>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-lg font-black text-red-600 font-sans tracking-tight">
+                          {flavor.price || "42.000đ"}
+                        </span>
+                        {flavor.priceUnit && (
+                          <span className="text-[11px] font-bold text-gray-600">
+                            / {flavor.priceUnit}
+                          </span>
+                        )}
+                      </div>
                       <span className="text-[10px] text-gray-400 block -mt-0.5">
                         (Chưa bao gồm VAT)
                       </span>

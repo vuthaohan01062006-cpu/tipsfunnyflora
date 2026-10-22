@@ -217,7 +217,7 @@ export default function Home() {
                       </Link>
                       <div className="flex justify-between items-end">
                         <span className="text-sm font-bold text-brand-choco">
-                          {flavor.price || "35.000đ"}
+                          {flavor.price || "35.000đ"} {flavor.priceUnit ? `/ ${flavor.priceUnit}` : ""}
                         </span>
                         <div className="flex items-center gap-2">
                           <Link
