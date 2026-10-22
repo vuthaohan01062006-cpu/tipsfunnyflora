@@ -138,7 +138,7 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     "id": 6,
-    "name": "Dâu Tây",
+    "name": "Strawberry",
     "desc": "Ngọt chua nhẹ tênh – Năng lượng tươi vui, rạng rỡ.",
     "price": "35.000đ",
     "color": "bg-[#FFD1DC]",
