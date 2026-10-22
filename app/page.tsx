@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Coffee, Heart, Gift, BookOpen, Send, ShoppingCart, Check, ArrowRight, Eye } from "lucide-react";
+import { Coffee, Heart, Gift, BookOpen, Send, ShoppingCart, Check, ArrowRight, Eye, Sparkles } from "lucide-react";
 import { INITIAL_PRODUCTS, Product, STORAGE_KEY } from "@/data/products";
 import { DEFAULT_BANNER, BannerConfig, BANNER_STORAGE_KEY } from "@/data/banner";
 import { DEFAULT_SITE_CONTENT, SiteContent, SITE_CONTENT_STORAGE_KEY } from "@/data/siteContent";
@@ -234,6 +234,58 @@ export default function Home() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Banner Bộ Sưu Tập Theo Mùa - Seasonal Specials */}
+      <section className="py-14 px-4 bg-gradient-to-r from-[#FCEAD2] via-[#FFF8F0] to-[#FCEAD2] border-y border-amber-200/50">
+        <div className="container mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="max-w-xl text-center md:text-left">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/80 border border-amber-300 text-amber-900 text-xs font-bold uppercase tracking-wider mb-3">
+              <Sparkles size={13} className="text-amber-600" />
+              <span>Seasonal Limited Edition</span>
+            </div>
+            <h2 className="text-2xl md:text-4xl font-extrabold text-brand-choco font-serif leading-tight">
+              Sản Phẩm Theo Mùa (Seasonal)
+            </h2>
+            <p className="text-sm md:text-base text-gray-700 mt-3 leading-relaxed">
+              Những nốt hương bánh ngọt giới hạn theo từng khoảnh khắc giao mùa: Bí Ngô Quế Gừng mùa thu, Bạc Hà Tuyết giáng sinh, Dâu Tây Champagne và Hạt Dẻ Nướng mật ong.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3 justify-center md:justify-start">
+              <Link
+                href="/seasonal"
+                className="bg-brand hover:bg-brand-dark text-white font-bold text-xs md:text-sm px-6 py-3 rounded-full shadow-md transition-all flex items-center gap-2 hover:scale-105 cursor-pointer"
+              >
+                <span>Khám Phá BST Theo Mùa</span>
+                <ArrowRight size={15} />
+              </Link>
+            </div>
+          </div>
+
+          {/* Quick mini grid of seasonal previews */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md w-full">
+            <Link href="/seasonal/seasonal-1" className="bg-white/95 p-3 rounded-2xl border border-amber-200/80 shadow-xs hover:shadow-md transition-all flex items-center gap-3 group">
+              <div className="w-14 h-14 rounded-xl overflow-hidden bg-amber-100 shrink-0">
+                <img src="https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=400&q=80" alt="Mùa Thu" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Mùa Thu 🍂</span>
+                <h4 className="text-xs font-bold text-brand-choco font-serif truncate mt-1">Bí Ngô Quế Gừng</h4>
+                <span className="text-xs font-black text-red-600 font-sans">42.000đ</span>
+              </div>
+            </Link>
+
+            <Link href="/seasonal/seasonal-2" className="bg-white/95 p-3 rounded-2xl border border-teal-200/80 shadow-xs hover:shadow-md transition-all flex items-center gap-3 group">
+              <div className="w-14 h-14 rounded-xl overflow-hidden bg-teal-100 shrink-0">
+                <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=400&q=80" alt="Giáng Sinh" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[10px] font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">Giáng Sinh 🎄</span>
+                <h4 className="text-xs font-bold text-brand-choco font-serif truncate mt-1">Bạc Hà Tuyết</h4>
+                <span className="text-xs font-black text-red-600 font-sans">42.000đ</span>
+              </div>
+            </Link>
           </div>
         </div>
       </section>
