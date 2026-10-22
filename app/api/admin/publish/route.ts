@@ -228,10 +228,10 @@ export interface SiteContent {
   contact: ContactConfig;
 }
 
-export const DEFAULT_SITE_CONTENT: SiteContent = \${JSON.stringify(siteContent, null, 2)};
+export const DEFAULT_SITE_CONTENT: SiteContent = ${JSON.stringify(siteContent, null, 2)};
 
 export const SITE_CONTENT_STORAGE_KEY = "treat_sweet_site_content_v3";
-\`;
+`;
       const base64SiteContent = Buffer.from(siteContentFileContent, "utf-8").toString("base64");
 
       const getSiteContentRes = await fetch(`https://api.github.com/repos/${repo}/contents/${siteContentPath}`, {
