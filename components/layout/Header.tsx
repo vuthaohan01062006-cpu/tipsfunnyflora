@@ -13,29 +13,35 @@ export default function Header() {
 
   return (
     <header className="bg-[#FFFCF9] sticky top-0 z-40 shadow-sm border-b border-orange-50/50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
-          <Link href="/" className="text-2xl font-bold text-brand-choco tracking-wide flex items-center gap-1.5">
+      <div className="container mx-auto px-2 sm:px-4 max-w-7xl">
+        <div className="flex items-center justify-between h-20 gap-2 xl:gap-4">
+          <Link 
+            href="/" 
+            className="text-lg sm:text-xl xl:text-2xl font-bold text-brand-choco tracking-tight xl:tracking-wide flex items-center gap-1 xl:gap-1.5 shrink-0 whitespace-nowrap select-none"
+          >
             <span>{t("nav.brand")}</span> <span className="text-brand">{t("nav.brandSub")}</span>
           </Link>
 
-          <nav className="hidden lg:flex items-center space-x-6">
-            <Link href="/" className="text-brand-choco hover:text-brand font-medium transition-colors text-xs tracking-wider uppercase">
+          <nav className="hidden lg:flex items-center gap-2 xl:gap-4 2xl:gap-6 shrink-0">
+            <Link 
+              href="/" 
+              className="text-brand-choco hover:text-brand font-medium transition-colors text-[11px] xl:text-xs tracking-normal xl:tracking-wider uppercase shrink-0 whitespace-nowrap"
+            >
               {t("nav.home")}
             </Link>
 
             {/* Menu / Sản Phẩm Dropdown */}
             <div 
-              className="relative group py-2"
+              className="relative group py-2 shrink-0"
               onMouseEnter={() => setIsMenuDropdown(true)}
               onMouseLeave={() => setIsMenuDropdown(false)}
             >
               <button 
                 onClick={() => setIsMenuDropdown(!isMenuDropdown)}
-                className="flex items-center gap-1 text-brand-choco hover:text-brand font-medium transition-colors text-xs tracking-wider uppercase cursor-pointer"
+                className="flex items-center gap-1 text-brand-choco hover:text-brand font-medium transition-colors text-[11px] xl:text-xs tracking-normal xl:tracking-wider uppercase cursor-pointer shrink-0 whitespace-nowrap"
               >
                 <span>{t("nav.menu")}</span>
-                <ChevronDown size={13} className={`transition-transform duration-200 ${isMenuDropdown ? "rotate-180 text-brand" : ""}`} />
+                <ChevronDown size={13} className={`transition-transform duration-200 shrink-0 ${isMenuDropdown ? "rotate-180 text-brand" : ""}`} />
               </button>
 
               {/* Dropdown Menu */}
@@ -50,7 +56,7 @@ export default function Header() {
                       <Cookie size={17} />
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-brand-choco group-hover/item:text-brand transition-colors uppercase">
+                      <div className="text-xs font-bold text-brand-choco group-hover/item:text-brand transition-colors uppercase whitespace-nowrap">
                         {t("nav.flavorsCollection")}
                       </div>
                       <p className="text-[11px] text-gray-500 mt-0.5 leading-tight">
@@ -70,9 +76,9 @@ export default function Header() {
                       <Sparkles size={17} />
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-brand-choco group-hover/item:text-brand transition-colors flex items-center gap-1.5 uppercase">
+                      <div className="text-xs font-bold text-brand-choco group-hover/item:text-brand transition-colors flex items-center gap-1.5 uppercase whitespace-nowrap">
                         <span>{t("nav.seasonal")}</span>
-                        <span className="text-[9px] bg-red-500 text-white font-bold px-1.5 py-0.2 rounded-full uppercase">HOT</span>
+                        <span className="text-[9px] bg-red-500 text-white font-bold px-1.5 py-0.2 rounded-full uppercase shrink-0">HOT</span>
                       </div>
                       <p className="text-[11px] text-gray-500 mt-0.5 leading-tight">
                         Phiên bản giới hạn theo mùa & dịp lễ hội
@@ -86,50 +92,62 @@ export default function Header() {
             {/* Quick Link: BST Theo Mùa */}
             <Link 
               href="/seasonal" 
-              className="text-amber-800 hover:text-brand font-semibold transition-colors text-[11px] tracking-wider uppercase flex items-center gap-1 bg-amber-50 hover:bg-amber-100/80 px-2.5 py-1 rounded-full border border-amber-200/70 shadow-xs"
+              className="text-amber-800 hover:text-brand font-semibold transition-colors text-[10px] xl:text-[11px] tracking-normal xl:tracking-wider uppercase flex items-center gap-1 bg-amber-50 hover:bg-amber-100/80 px-2 py-0.5 xl:px-2.5 xl:py-1 rounded-full border border-amber-200/70 shadow-xs shrink-0 whitespace-nowrap"
             >
-              <Sparkles size={12} className="text-amber-600 animate-pulse" />
+              <Sparkles size={11} className="text-amber-600 animate-pulse shrink-0" />
               <span>{t("nav.seasonalShort")}</span>
             </Link>
 
-            <Link href="/blog" className="text-brand-choco hover:text-brand font-medium transition-colors text-xs tracking-wider uppercase">
+            <Link 
+              href="/blog" 
+              className="text-brand-choco hover:text-brand font-medium transition-colors text-[11px] xl:text-xs tracking-normal xl:tracking-wider uppercase shrink-0 whitespace-nowrap"
+            >
               {t("nav.blog")}
             </Link>
-            <Link href="/#custom" className="text-brand-choco hover:text-brand font-medium transition-colors text-xs tracking-wider uppercase">
+            <Link 
+              href="/#custom" 
+              className="text-brand-choco hover:text-brand font-medium transition-colors text-[11px] xl:text-xs tracking-normal xl:tracking-wider uppercase shrink-0 whitespace-nowrap"
+            >
               {t("nav.custom")}
             </Link>
-            <Link href="/about" className="text-brand-choco hover:text-brand font-medium transition-colors text-xs tracking-wider uppercase">
+            <Link 
+              href="/about" 
+              className="text-brand-choco hover:text-brand font-medium transition-colors text-[11px] xl:text-xs tracking-normal xl:tracking-wider uppercase shrink-0 whitespace-nowrap"
+            >
               {t("nav.about")}
             </Link>
-            <Link href="/contact" className="text-brand-choco hover:text-brand font-medium transition-colors text-xs tracking-wider uppercase">
+            <Link 
+              href="/contact" 
+              className="text-brand-choco hover:text-brand font-medium transition-colors text-[11px] xl:text-xs tracking-normal xl:tracking-wider uppercase shrink-0 whitespace-nowrap"
+            >
               {t("nav.contact")}
             </Link>
           </nav>
 
-          <div className="flex items-center space-x-3.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 xl:gap-3.5 shrink-0 whitespace-nowrap">
             {/* Language Switcher Pill */}
             <button
               onClick={toggleLanguage}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-brand/25 bg-white hover:bg-brand-vanilla text-brand-choco transition-all shadow-xs text-xs font-bold cursor-pointer group"
+              className="flex items-center gap-1 px-2 py-1 xl:px-3 xl:py-1.5 rounded-full border border-brand/25 bg-white hover:bg-brand-vanilla text-brand-choco transition-all shadow-xs text-[11px] xl:text-xs font-bold cursor-pointer group shrink-0 whitespace-nowrap"
               title={language === "vi" ? "Switch to English" : "Chuyển sang Tiếng Việt"}
             >
-              <span className="text-sm select-none">{language === "vi" ? "🇻🇳" : "🇬🇧"}</span>
-              <span className="uppercase text-[11px] tracking-wider text-brand font-bold group-hover:text-brand-dark">
+              <span className="text-xs xl:text-sm select-none">{language === "vi" ? "🇻🇳" : "🇬🇧"}</span>
+              <span className="uppercase text-[10px] xl:text-[11px] tracking-wider text-brand font-bold group-hover:text-brand-dark">
                 {language === "vi" ? "VI" : "EN"}
               </span>
             </button>
 
-            <button className="text-brand-choco hover:text-brand p-1 cursor-pointer" title={t("nav.search")}>
-              <Search size={19} />
+            <button className="text-brand-choco hover:text-brand p-1 cursor-pointer shrink-0" title={t("nav.search")}>
+              <Search size={18} className="xl:w-[19px] xl:h-[19px]" />
             </button>
             
             {/* Shopping Cart Button with Dynamic Badge */}
             <button 
               onClick={() => setIsCartOpen(true)}
-              className="text-brand-choco hover:text-brand relative p-1 transition-colors cursor-pointer" 
+              className="text-brand-choco hover:text-brand relative p-1 transition-colors cursor-pointer shrink-0" 
               title={t("nav.cart")}
             >
-              <ShoppingCart size={19} />
+              <ShoppingCart size={18} className="xl:w-[19px] xl:h-[19px]" />
               {totalItems > 0 && (
                 <span className="absolute -top-1 -right-1 bg-brand text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse shadow-sm">
                   {totalItems > 99 ? "99+" : totalItems}
@@ -137,11 +155,11 @@ export default function Header() {
               )}
             </button>
 
-            <Link href="/admin" className="text-brand-choco hover:text-brand p-1 rounded-full hover:bg-brand-vanilla transition-colors" title={t("nav.admin")}>
-              <User size={19} />
+            <Link href="/admin" className="text-brand-choco hover:text-brand p-1 rounded-full hover:bg-brand-vanilla transition-colors shrink-0" title={t("nav.admin")}>
+              <User size={18} className="xl:w-[19px] xl:h-[19px]" />
             </Link>
 
-            <button className="lg:hidden text-brand-choco p-1" onClick={() => setIsOpen(!isOpen)}>
+            <button className="lg:hidden text-brand-choco p-1 shrink-0" onClick={() => setIsOpen(!isOpen)} aria-label="Toggle navigation menu">
               {isOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
