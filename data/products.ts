@@ -14,7 +14,7 @@ export const INITIAL_PRODUCTS: Product[] = [
   {
     id: 1,
     name: "Vani Madagascar",
-    desc: "Ngọt dịu, thanh lịch – Dành cho nốt bình yên.",
+    desc: "Thơm béo ngọt ngào cho ngày dịu êm.",
     price: "35.000đ",
     color: "bg-[#FDF8E1]",
     textColor: "text-brand-choco",
@@ -25,7 +25,7 @@ export const INITIAL_PRODUCTS: Product[] = [
   {
     id: 2,
     name: "Uji Matcha",
-    desc: "Thanh nhẹ, thoảng đắng – Dành cho lúc cần tĩnh lặng.",
+    desc: "Thanh nhẹ thoảng đắng chạm nhẹ nốt bình yên.",
     price: "35.000đ",
     color: "bg-[#D0E3C5]",
     textColor: "text-brand-choco",
@@ -35,8 +35,8 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 3,
-    name: "Chanh Vàng",
-    desc: "Chua thanh sảng khoái – Đánh thức sự tỉnh táo.",
+    name: "Lemonade",
+    desc: "Chua dịu tươi mát đánh thức tâm trạng.",
     price: "35.000đ",
     color: "bg-[#FFFACD]",
     textColor: "text-brand-choco",
@@ -56,7 +56,7 @@ export const INITIAL_PRODUCTS: Product[] = [
   {
     id: 5,
     name: "Socola Ganache",
-    desc: "Đậm đà, béo ấm – Một cái ôm ngọt ngào.",
+    desc: "Ngọt đắng đan xen trọn vị ấm áp.",
     price: "38.000đ",
     color: "bg-[#8B5A2B]",
     textColor: "text-white",
@@ -78,7 +78,7 @@ export const INITIAL_PRODUCTS: Product[] = [
   {
     id: 7,
     name: "Blueberry Mascarpone",
-    desc: "Béo mịn, chua dịu – Thong thả tận hưởng điểm nhấn.",
+    desc: "Chua thanh béo mịn ngọt ngào chạm cảm xúc.",
     price: "38.000đ",
     color: "bg-[#E1D5E7]",
     textColor: "text-brand-choco",
@@ -87,4 +87,4 @@ export const INITIAL_PRODUCTS: Product[] = [
   }
 ];
 
-export const STORAGE_KEY = "treat_sweet_products_v1";
+export const STORAGE_KEY = "treat_sweet_products_v2";
