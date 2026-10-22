@@ -115,11 +115,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       "Nhân bánh: Ganache socola Bỉ nấu sệt sánh mịn, đắng êm dịu mà quyến rũ",
       "Hậu vị: Nốt hương khói cacao trầm ấm lưu lại lâu dài và đầy mê hoặc"
     ],
-    "gallery": [
-      "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=800&q=85"
-    ]
+    "gallery": []
   },
   {
     "id": 6,
@@ -139,11 +135,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       "Nhân bánh: Lớp mứt dâu tây rim sệt kết hợp ganache dâu tươi thơm lừng",
       "Hậu vị: Chua ngọt cân bằng, nhẹ nhõm như bước đi giữa khu vườn hoa quả"
     ],
-    "gallery": [
-      "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1570476922354-81227cdbb76c?auto=format&fit=crop&w=800&q=85"
-    ]
+    "gallery": []
   },
   {
     "id": 7,
