@@ -160,9 +160,11 @@ export default function AdminDashboard() {
     try {
       const savedContent = localStorage.getItem(SITE_CONTENT_STORAGE_KEY);
       if (savedContent) {
-        const parsed = JSON.parse(savedContent);
+        const loadedBlogs = (parsed.blogs && Array.isArray(parsed.blogs) && parsed.blogs.length >= DEFAULT_SITE_CONTENT.blogs.length)
+          ? parsed.blogs
+          : DEFAULT_SITE_CONTENT.blogs;
         setSiteContent({
-          blogs: parsed.blogs || DEFAULT_SITE_CONTENT.blogs,
+          blogs: loadedBlogs,
           customBox: parsed.customBox || DEFAULT_SITE_CONTENT.customBox,
           about: parsed.about || DEFAULT_SITE_CONTENT.about,
           contact: parsed.contact || DEFAULT_SITE_CONTENT.contact,
@@ -1608,9 +1610,10 @@ export default function AdminDashboard() {
                       onChange={(e) => setNewBlog({ ...newBlog, category: e.target.value as any })}
                       className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm"
                     >
+                      <option value="Quà tặng">Quà tặng</option>
+                      <option value="Cảm xúc">Cảm xúc</option>
                       <option value="Kỹ thuật">Kỹ thuật</option>
                       <option value="Nguyên liệu">Nguyên liệu</option>
-                      <option value="Cảm xúc">Cảm xúc</option>
                       <option value="Sự kiện">Sự kiện</option>
                     </select>
                   </div>
@@ -1771,9 +1774,10 @@ export default function AdminDashboard() {
                           onChange={(e) => setEditBlogForm({ ...editBlogForm, category: e.target.value as any })}
                           className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brand focus:outline-none bg-white"
                         >
+                          <option value="Quà tặng">Quà tặng</option>
+                          <option value="Cảm xúc">Cảm xúc</option>
                           <option value="Kỹ thuật">Kỹ thuật</option>
                           <option value="Nguyên liệu">Nguyên liệu</option>
-                          <option value="Cảm xúc">Cảm xúc</option>
                           <option value="Sự kiện">Sự kiện</option>
                         </select>
                       </div>
