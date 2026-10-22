@@ -30,30 +30,37 @@ export default function SeasonalPage() {
   const { language, t } = useLanguage();
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(SEASONAL_STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          // Merge with initial products to retain rich details if missing
-          const merged = parsed.map((item: any) => {
-            const initial = INITIAL_SEASONAL_PRODUCTS.find(p => String(p.id) === String(item.id));
-            return {
-              ...initial,
-              ...item,
-              image: item.image || initial?.image || "",
-              gallery: item.gallery || initial?.gallery || [],
-              ingredients: item.ingredients || initial?.ingredients || "",
-              structure: item.structure || initial?.structure || [],
-              fullDesc: item.fullDesc || initial?.fullDesc || item.desc || initial?.desc || "",
-            };
-          });
-          setProducts(merged);
+    const reloadSeasonal = () => {
+      try {
+        const saved = localStorage.getItem(SEASONAL_STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            // Merge with initial products to retain rich details if missing
+            const merged = parsed.map((item: any) => {
+              const initial = INITIAL_SEASONAL_PRODUCTS.find(p => String(p.id) === String(item.id));
+              return {
+                ...initial,
+                ...item,
+                image: item.image || initial?.image || "",
+                gallery: item.gallery && item.gallery.length > 0 ? item.gallery : (initial?.gallery || []),
+                ingredients: item.ingredients || initial?.ingredients || "",
+                structure: item.structure || initial?.structure || [],
+                fullDesc: item.fullDesc || initial?.fullDesc || item.desc || initial?.desc || "",
+              };
+            });
+            setProducts(merged);
+          }
         }
+      } catch {
+        // fallback
       }
-    } catch {
-      // fallback
-    }
+    };
+
+    reloadSeasonal();
+
+    window.addEventListener("storage", reloadSeasonal);
+    return () => window.removeEventListener("storage", reloadSeasonal);
   }, []);
 
   // Filter seasons
