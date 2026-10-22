@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useCart } from "@/context/CartContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
 
 export default function CartDrawer() {
@@ -18,6 +19,8 @@ export default function CartDrawer() {
     setIsCheckoutOpen,
   } = useCart();
 
+  const { t } = useLanguage();
+
   if (!isCartOpen) return null;
 
   const handleCheckoutClick = () => {
@@ -29,7 +32,7 @@ export default function CartDrawer() {
     <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
         onClick={() => setIsCartOpen(false)}
       />
 
@@ -40,12 +43,12 @@ export default function CartDrawer() {
             <div className="flex items-center gap-2">
               <ShoppingBag className="text-brand" size={22} />
               <h2 className="text-xl font-bold font-serif text-brand-choco">
-                Giỏ Hàng ({totalItems})
+                {t("cart.title")} ({totalItems})
               </h2>
             </div>
             <button
               onClick={() => setIsCartOpen(false)}
-              className="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-brand-choco hover:bg-gray-100 transition-colors"
+              className="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-brand-choco hover:bg-gray-100 transition-colors cursor-pointer"
             >
               <X size={20} />
             </button>
@@ -59,66 +62,60 @@ export default function CartDrawer() {
                   <ShoppingBag size={36} />
                 </div>
                 <h3 className="text-lg font-bold text-brand-choco mb-2">
-                  Giỏ hàng đang trống
+                  {t("cart.emptyTitle")}
                 </h3>
                 <p className="text-sm text-brand-choco/70 max-w-xs mb-6">
-                  Bạn chưa chọn chiếc bánh Macaron ngọt ngào nào. Hãy khám phá bộ sưu tập 7 vị bánh của chúng mình nhé!
+                  {t("cart.emptySub")}
                 </p>
                 <button
                   onClick={() => setIsCartOpen(false)}
-                  className="px-6 py-2.5 rounded-full bg-brand text-white font-semibold text-sm hover:bg-brand-dark transition-colors shadow-sm"
+                  className="px-6 py-2.5 rounded-full bg-brand text-white font-semibold text-sm hover:bg-brand-dark transition-colors shadow-sm cursor-pointer"
                 >
-                  Khám phá hương vị bánh
+                  {t("cart.exploreBtn")}
                 </button>
               </div>
             ) : (
               items.map((item) => (
                 <div
                   key={item.id}
-                  className="p-4 rounded-2xl border border-gray-100 bg-[#FFFDF9] flex gap-4 items-center justify-between hover:shadow-sm transition-shadow"
+                  className="flex items-center gap-4 p-3.5 rounded-2xl bg-[#FFFDF9] border border-orange-100/70 hover:shadow-sm transition-shadow"
                 >
-                  {/* Thumbnail */}
-                  <div className={`w-16 h-16 rounded-xl overflow-hidden shrink-0 ${item.color || "bg-brand-vanilla"} flex items-center justify-center border border-brand/20`}>
-                    {item.image ? (
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-xs font-bold text-brand-choco">
-                        {item.name.substring(0, 2)}
-                      </span>
-                    )}
+                  {/* Item Image */}
+                  <div className="w-16 h-16 rounded-xl overflow-hidden bg-brand-vanilla/40 shrink-0 border border-brand-vanilla">
+                    <img
+                      src={item.image || "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=400&q=80"}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
 
-                  {/* Info */}
+                  {/* Item Info */}
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-bold text-brand-choco truncate">
+                    <h4 className="font-bold text-brand-choco text-sm truncate font-serif">
                       {item.name}
                     </h4>
-                    <p className="text-xs font-semibold text-brand mt-0.5">
-                      {item.price}
+                    <p className="text-xs text-brand font-semibold mt-0.5">
+                      {item.priceString}
                     </p>
 
-                    {/* Quantity controls */}
+                    {/* Quantity Selector */}
                     <div className="flex items-center gap-2 mt-2">
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="w-7 h-7 rounded-lg border border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand hover:text-brand transition-colors bg-white"
-                        title="Giảm số lượng"
+                        className="w-6 h-6 rounded-md bg-white border border-gray-200 text-gray-500 hover:text-brand-choco hover:border-brand flex items-center justify-center transition-colors cursor-pointer"
+                        title="Giảm 1"
                       >
-                        <Minus size={13} />
+                        <Minus size={12} />
                       </button>
-                      <span className="text-xs font-bold text-brand-choco w-6 text-center">
+                      <span className="text-xs font-bold text-brand-choco w-6 text-center select-none">
                         {item.quantity}
                       </span>
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="w-7 h-7 rounded-lg border border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand hover:text-brand transition-colors bg-white"
-                        title="Tăng số lượng"
+                        className="w-6 h-6 rounded-md bg-white border border-gray-200 text-gray-500 hover:text-brand-choco hover:border-brand flex items-center justify-center transition-colors cursor-pointer"
+                        title="Tăng 1"
                       >
-                        <Plus size={13} />
+                        <Plus size={12} />
                       </button>
                     </div>
                   </div>
@@ -127,7 +124,7 @@ export default function CartDrawer() {
                   <div className="text-right flex flex-col justify-between items-end h-16">
                     <button
                       onClick={() => removeFromCart(item.id)}
-                      className="text-gray-300 hover:text-red-500 transition-colors p-1"
+                      className="text-gray-300 hover:text-red-500 transition-colors p-1 cursor-pointer"
                       title="Xóa món"
                     >
                       <Trash2 size={16} />
@@ -146,17 +143,17 @@ export default function CartDrawer() {
             <div className="p-6 border-t border-gray-100 bg-[#FFFCF9] space-y-4">
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between text-gray-600">
-                  <span>Tạm tính ({totalItems} bánh):</span>
+                  <span>{t("cart.subtotal")} ({totalItems}):</span>
                   <span className="font-semibold text-brand-choco">{formatPrice(totalPrice)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
-                  <span>Phí giao hàng:</span>
+                  <span>{t("cart.shipping")}:</span>
                   <span className="text-emerald-600 font-semibold">
-                    {totalPrice >= 200000 ? "Miễn phí" : "20.000đ"}
+                    {totalPrice >= 200000 ? t("cart.shippingFree") : "20.000đ"}
                   </span>
                 </div>
                 <div className="flex justify-between text-base font-bold text-brand-choco pt-2 border-t border-gray-200">
-                  <span>Tổng thanh toán:</span>
+                  <span>{t("cart.total")}:</span>
                   <span className="text-xl text-brand font-serif">
                     {formatPrice(totalPrice >= 200000 ? totalPrice : totalPrice + 20000)}
                   </span>
@@ -166,16 +163,16 @@ export default function CartDrawer() {
               <div className="space-y-2">
                 <button
                   onClick={handleCheckoutClick}
-                  className="w-full py-3.5 px-4 rounded-2xl bg-brand text-white font-bold text-sm hover:bg-brand-dark transition-all shadow-md flex items-center justify-center gap-2 group"
+                  className="w-full py-3.5 px-4 rounded-2xl bg-brand text-white font-bold text-sm hover:bg-brand-dark transition-all shadow-md flex items-center justify-center gap-2 group cursor-pointer"
                 >
-                  <span>Tiến Hành Đặt Hàng & Thanh Toán</span>
+                  <span>{t("cart.checkoutBtn")}</span>
                   <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button
                   onClick={clearCart}
-                  className="w-full py-2 text-xs text-gray-400 hover:text-red-500 transition-colors text-center"
+                  className="w-full py-2 text-xs text-gray-400 hover:text-red-500 transition-colors text-center cursor-pointer"
                 >
-                  Xóa tất cả sản phẩm
+                  {t("cart.clearAll")}
                 </button>
               </div>
             </div>
