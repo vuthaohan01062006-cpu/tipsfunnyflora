@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className="bg-brand-choco text-white py-12">
@@ -10,17 +12,17 @@ export default function Footer() {
         <div>
           <h4 className="font-semibold mb-4 text-brand-vanilla">Khám Phá</h4>
           <ul className="text-gray-300 text-sm space-y-2">
-            <li>Bộ Sưu Tập 7 Vị</li>
-            <li>Sau Lớp Vỏ (Blog)</li>
-            <li>Custom Box</li>
+            <li><Link href="/#flavors" className="hover:text-brand-vanilla">Bộ Sưu Tập 7 Vị</Link></li>
+            <li><Link href="/blog" className="hover:text-brand-vanilla">Sau Lớp Vỏ (Blog)</Link></li>
+            <li><Link href="/#custom" className="hover:text-brand-vanilla">Custom Box</Link></li>
           </ul>
         </div>
         <div>
           <h4 className="font-semibold mb-4 text-brand-vanilla">Chính Sách</h4>
           <ul className="text-gray-300 text-sm space-y-2">
-            <li>Cam kết thủ công</li>
+            <li>Cam kết thủ công 100%</li>
             <li>Bảo quản 10 phút vàng</li>
-            <li>Giao hàng & Đóng gói</li>
+            <li>Giao hàng & Đóng gói quà</li>
           </ul>
         </div>
         <div>
@@ -29,11 +31,22 @@ export default function Footer() {
             <li>TikTok: @treatsweet.macaron</li>
             <li>Fanpage: Treat Sweet Macaron</li>
             <li>Hotline: 0909 123 456</li>
+            <li className="pt-2">
+              <Link 
+                href="/admin" 
+                className="inline-flex items-center text-xs text-brand-vanilla/60 hover:text-brand transition-colors"
+              >
+                🔒 Trang Quản Trị (Admin)
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
-      <div className="text-center text-gray-400 text-sm mt-12 border-t border-white/10 pt-6">
-        © 2026 Treat Sweet Macaron. All rights reserved.
+      <div className="text-center text-gray-400 text-xs mt-12 border-t border-white/10 pt-6 flex flex-col sm:flex-row justify-between items-center container mx-auto px-4">
+        <span>© 2026 Treat Sweet Macaron. All rights reserved.</span>
+        <Link href="/admin" className="text-gray-500 hover:text-brand text-xs mt-2 sm:mt-0 transition-colors">
+          Cổng Đăng Nhập Quản Trị Viên
+        </Link>
       </div>
     </footer>
   );
