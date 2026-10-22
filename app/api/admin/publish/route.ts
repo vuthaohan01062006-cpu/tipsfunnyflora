@@ -15,6 +15,7 @@ export async function POST(request: Request) {
   name: string;
   desc: string;
   price: string;
+  priceUnit?: string;
   color: string;
   textColor?: string;
   image?: string;
@@ -71,6 +72,7 @@ export const SEASONAL_STORAGE_KEY = "treat_sweet_seasonal_v1";
   name: string;
   desc: string;
   price?: string;
+  priceUnit?: string;
   color: string;
   textColor?: string;
   image?: string;
@@ -173,7 +175,7 @@ export const BANNER_STORAGE_KEY = "treat_sweet_banner_v2";
       const siteContentFileContent = `export interface BlogPost {
   id: number | string;
   title: string;
-  category: "Kỹ thuật" | "Nguyên liệu" | "Cảm xúc" | "Sự kiện";
+  category: "Kỹ thuật" | "Nguyên liệu" | "Cảm xúc" | "Sự kiện" | "Quà tặng";
   date: string;
   readTime: string;
   excerpt: string;
@@ -185,6 +187,7 @@ export const BANNER_STORAGE_KEY = "treat_sweet_banner_v2";
 export interface CustomBoxConfig {
   title: string;
   subtitle: string;
+  image?: string;
   box6Price: string;
   box12Price: string;
   description: string;
@@ -201,6 +204,7 @@ export interface AboutCommitment {
 export interface AboutConfig {
   title: string;
   subtitle: string;
+  image?: string;
   storyP1: string;
   storyP2: string;
   commitments: AboutCommitment[];
@@ -224,10 +228,10 @@ export interface SiteContent {
   contact: ContactConfig;
 }
 
-export const DEFAULT_SITE_CONTENT: SiteContent = ${JSON.stringify(siteContent, null, 2)};
+export const DEFAULT_SITE_CONTENT: SiteContent = \${JSON.stringify(siteContent, null, 2)};
 
-export const SITE_CONTENT_STORAGE_KEY = "treat_sweet_site_content_v2";
-`;
+export const SITE_CONTENT_STORAGE_KEY = "treat_sweet_site_content_v3";
+\`;
       const base64SiteContent = Buffer.from(siteContentFileContent, "utf-8").toString("base64");
 
       const getSiteContentRes = await fetch(`https://api.github.com/repos/${repo}/contents/${siteContentPath}`, {
