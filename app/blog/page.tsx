@@ -29,12 +29,16 @@ export default function BlogPage() {
         const saved = localStorage.getItem(SITE_CONTENT_STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (parsed.blogs && Array.isArray(parsed.blogs) && parsed.blogs.length > 0) {
+          if (parsed.blogs && Array.isArray(parsed.blogs) && parsed.blogs.length >= DEFAULT_SITE_CONTENT.blogs.length) {
             setBlogs(parsed.blogs);
+          } else {
+            setBlogs(DEFAULT_SITE_CONTENT.blogs);
           }
+        } else {
+          setBlogs(DEFAULT_SITE_CONTENT.blogs);
         }
       } catch {
-        // fallback
+        setBlogs(DEFAULT_SITE_CONTENT.blogs);
       }
     };
 
@@ -44,7 +48,7 @@ export default function BlogPage() {
     return () => window.removeEventListener("storage", reloadBlogs);
   }, []);
 
-  const categories = ["Tất cả", "Kỹ thuật", "Nguyên liệu", "Cảm xúc", "Sự kiện"];
+  const categories = ["Tất cả", "Quà tặng", "Cảm xúc", "Kỹ thuật", "Nguyên liệu", "Sự kiện"];
 
   const filteredBlogs = selectedCategory === "Tất cả" 
     ? blogs 
@@ -236,6 +240,39 @@ export default function BlogPage() {
 
               <div className="text-sm md:text-base text-brand-choco/85 leading-relaxed space-y-4 pt-2 whitespace-pre-line">
                 <p>{activePost.content}</p>
+              </div>
+
+              {/* Gifting Call-To-Action Card */}
+              <div className="bg-gradient-to-r from-brand-vanilla/70 via-[#FFF5F8] to-brand-vanilla/70 p-6 rounded-2xl border border-brand/20 my-4 text-center shadow-xs">
+                <div className="inline-flex items-center justify-center gap-1.5 text-brand font-bold text-xs uppercase tracking-wider mb-1.5">
+                  <Sparkles size={14} className="text-brand animate-pulse" /> Gửi Trao Yêu Thương Cùng Treat Sweet
+                </div>
+                <p className="text-xs text-brand-choco/80 max-w-md mx-auto mb-4 leading-relaxed">
+                  Dành tặng người thương hoặc tự thưởng cho bản thân một hộp macaron thủ công chuẩn Pháp dập kim pastel kèm thiệp viết tay nắn nót.
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-2.5">
+                  <Link 
+                    href="/#custom" 
+                    onClick={() => setActivePost(null)}
+                    className="bg-brand text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-brand-dark transition-all shadow-sm"
+                  >
+                    🎁 Đặt Hộp Quà Custom Box
+                  </Link>
+                  <Link 
+                    href="/#flavors" 
+                    onClick={() => setActivePost(null)}
+                    className="bg-white border border-brand/30 text-brand-choco hover:bg-brand-vanilla px-4 py-2 rounded-full text-xs font-bold transition-all shadow-xs"
+                  >
+                    🍪 Xem 7 Vị Bánh
+                  </Link>
+                  <Link 
+                    href="/seasonal" 
+                    onClick={() => setActivePost(null)}
+                    className="bg-amber-100 text-amber-900 border border-amber-300 hover:bg-amber-200 px-4 py-2 rounded-full text-xs font-bold transition-all shadow-xs"
+                  >
+                    🍂 BST Theo Mùa
+                  </Link>
+                </div>
               </div>
 
               <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
