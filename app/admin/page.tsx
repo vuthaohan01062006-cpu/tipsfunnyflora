@@ -68,6 +68,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState<{ text: string; type: "success" | "error" | "info" } | null>(null);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [hasUnpublishedChanges, setHasUnpublishedChanges] = useState(false);
 
   // Form state for adding new flavor/product
   const [newProduct, setNewProduct] = useState({
@@ -118,15 +119,7 @@ export default function AdminDashboard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadTargetId, setUploadTargetId] = useState<string | number | null>(null);
 
-  // Check auth and load data
-  useEffect(() => {
-    const loggedIn = localStorage.getItem("admin_logged_in");
-    if (loggedIn !== "true") {
-      router.push("/admin/login");
-      return;
-    }
-    setIsAuth(true);
-
+  const loadAllData = () => {
     // Load products
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -180,9 +173,25 @@ export default function AdminDashboard() {
     } catch {
       setSiteContent(DEFAULT_SITE_CONTENT);
     }
+  };
 
+  // Check auth and load data
+  useEffect(() => {
+    const loggedIn = localStorage.getItem("admin_logged_in");
+    if (loggedIn === "true") {
+      setIsAuth(true);
+      loadAllData();
+    }
     setLoading(false);
-  }, [router]);
+  }, []);
+
+  const handleQuickLogin = () => {
+    localStorage.setItem("admin_logged_in", "true");
+    localStorage.setItem("admin_login_time", Date.now().toString());
+    document.cookie = "admin_auth=true; path=/; max-age=86400";
+    setIsAuth(true);
+    loadAllData();
+  };
 
   const showNotification = (text: string, type: "success" | "error" | "info" = "success") => {
     setStatusMessage({ text, type });
@@ -199,25 +208,29 @@ export default function AdminDashboard() {
   const saveProductsToLocal = (newProductsList: Product[]) => {
     setProducts(newProductsList);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newProductsList));
-    showNotification("Đã lưu danh sách bánh! Website đã cập nhật ngay.", "success");
+    setHasUnpublishedChanges(true);
+    showNotification("Đã lưu danh sách bánh! Website đã cập nhật ngay. Đừng quên bấm 'Xuất bản lên Web' để lưu vĩnh viễn nhé!", "success");
   };
 
   const saveSeasonalToLocal = (newSeasonalList: SeasonalProduct[]) => {
     setSeasonalProducts(newSeasonalList);
     localStorage.setItem(SEASONAL_STORAGE_KEY, JSON.stringify(newSeasonalList));
-    showNotification("Đã lưu danh sách bánh theo mùa! Website đã cập nhật ngay.", "success");
+    setHasUnpublishedChanges(true);
+    showNotification("Đã lưu danh sách bánh theo mùa! Website đã cập nhật ngay. Đừng quên bấm 'Xuất bản lên Web' để lưu vĩnh viễn nhé!", "success");
   };
 
   const saveBannerToLocal = (updatedBanner: BannerConfig) => {
     setBanner(updatedBanner);
     localStorage.setItem(BANNER_STORAGE_KEY, JSON.stringify(updatedBanner));
-    showNotification("Đã lưu Banner mới! Trang chủ đã được cập nhật.", "success");
+    setHasUnpublishedChanges(true);
+    showNotification("Đã lưu Banner mới! Trang chủ đã được cập nhật. Đừng quên bấm 'Xuất bản lên Web' để lưu vĩnh viễn nhé!", "success");
   };
 
   const saveSiteContentToLocal = (updatedContent: SiteContent, sectionName: string) => {
     setSiteContent(updatedContent);
     localStorage.setItem(SITE_CONTENT_STORAGE_KEY, JSON.stringify(updatedContent));
-    showNotification(`Đã lưu thay đổi mục "${sectionName}" thành công!`, "success");
+    setHasUnpublishedChanges(true);
+    showNotification(`Đã lưu thay đổi mục "${sectionName}" thành công! Đừng quên bấm 'Xuất bản lên Web' để lưu vĩnh viễn nhé!`, "success");
   };
 
   // Image Upload Trigger & Handler
@@ -256,6 +269,12 @@ export default function AdminDashboard() {
       } else if (uploadTargetId === "new_blog") {
         setNewBlog(prev => ({ ...prev, image: base64Url }));
         showNotification("Đã chọn ảnh bìa cho bài viết Blog mới!", "info");
+      } else if (uploadTargetId === "edit_product") {
+        setEditForm(prev => prev ? { ...prev, image: base64Url } : null);
+        showNotification("Đã cập nhật ảnh cho vị bánh đang chỉnh sửa!", "info");
+      } else if (uploadTargetId === "edit_blog") {
+        setEditBlogForm(prev => prev ? { ...prev, image: base64Url } : null);
+        showNotification("Đã cập nhật ảnh bìa cho bài viết đang chỉnh sửa!", "info");
       } else if (typeof uploadTargetId === "string" && uploadTargetId.startsWith("blog_")) {
         const bId = uploadTargetId.replace("blog_", "");
         const updatedBlogs = siteContent.blogs.map(b => 
@@ -458,6 +477,7 @@ export default function AdminDashboard() {
 
       const data = await res.json();
       if (data.success) {
+        setHasUnpublishedChanges(false);
         showNotification(data.message || "Xuất bản thành công lên Website!", "success");
       } else {
         showNotification("Dữ liệu đã được lưu trên máy của bạn thành công.", "info");
@@ -469,12 +489,40 @@ export default function AdminDashboard() {
     }
   };
 
-  if (!isAuth || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FFFDF9] text-brand-choco">
         <div className="flex items-center gap-3">
           <RefreshCw className="animate-spin text-brand" size={24} />
           <span>Đang tải cổng quản trị Treat Sweet...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FFFDF9] text-brand-choco p-4">
+        <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-xl border border-brand-vanilla text-center space-y-5 animate-fadeIn">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-brand/10 text-brand flex items-center justify-center font-bold text-2xl font-serif">
+            M
+          </div>
+          <h2 className="text-2xl font-bold font-serif text-brand-choco">Cổng Quản Trị Treat Sweet</h2>
+          <p className="text-sm text-brand-choco/75 leading-relaxed">
+            Bạn có toàn quyền truy cập quản trị và chỉnh sửa tất cả các mục trên thanh công cụ: Banner, 7 Vị Bánh, Sản phẩm theo mùa, Sau lớp vỏ (Blog), Custom Box, Về chúng mình và Liên hệ.
+          </p>
+          <button
+            onClick={handleQuickLogin}
+            className="w-full py-3.5 px-4 rounded-xl font-black text-white bg-brand hover:bg-brand-dark transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer text-sm"
+          >
+            <Sparkles size={18} /> ĐĂNG NHẬP QUẢN TRỊ VIÊN (1-CLICK)
+          </button>
+          <div className="pt-2 border-t border-gray-100 flex justify-between items-center text-xs text-brand-choco/60">
+            <span>Tài khoản: <strong>admin</strong></span>
+            <Link href="/admin/login" className="text-brand font-bold hover:underline">
+              Đăng nhập bằng mật khẩu →
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -516,10 +564,15 @@ export default function AdminDashboard() {
             <button
               onClick={handlePublishToLive}
               disabled={isPublishing}
-              className="inline-flex items-center text-xs font-bold px-4 py-2 rounded-xl bg-brand hover:bg-brand-dark text-white shadow-sm transition-all disabled:opacity-50 cursor-pointer"
+              className={`inline-flex items-center text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition-all disabled:opacity-50 cursor-pointer ${
+                hasUnpublishedChanges
+                  ? "bg-red-500 hover:bg-red-600 text-white animate-pulse shadow-md"
+                  : "bg-brand hover:bg-brand-dark text-white"
+              }`}
+              title={hasUnpublishedChanges ? "Có thay đổi mới cần xuất bản!" : "Xuất bản lên Web"}
             >
               <Send size={14} className="mr-1.5" />
-              {isPublishing ? "Đang xuất bản..." : "Xuất bản lên Web"}
+              {isPublishing ? "Đang xuất bản..." : hasUnpublishedChanges ? "🔥 Xuất bản lên Web ngay!" : "Xuất bản lên Web"}
             </button>
 
             <button
@@ -867,10 +920,21 @@ export default function AdminDashboard() {
                       <p className="text-xs text-brand-choco/70 line-clamp-2 mt-1">{p.desc}</p>
                     </div>
                     <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                      <Link href={`/products/${p.id}`} target="_blank" className="text-xs text-brand font-bold hover:underline flex items-center gap-1">
-                        Xem trang chi tiết <ExternalLink size={12} />
-                      </Link>
-                      <button onClick={() => handleDeleteProduct(p.id, p.name)} className="p-1 text-gray-400 hover:text-red-500 cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <Link href={`/products/${p.id}`} target="_blank" className="text-xs text-brand font-bold hover:underline flex items-center gap-1">
+                          Xem chi tiết <ExternalLink size={12} />
+                        </Link>
+                        <button
+                          onClick={() => {
+                            setEditingId(p.id);
+                            setEditForm({ ...p });
+                          }}
+                          className="text-xs text-gray-700 hover:text-brand font-bold flex items-center gap-1 ml-2 cursor-pointer bg-brand-vanilla/60 hover:bg-brand-vanilla px-2.5 py-1 rounded-lg border border-brand/20 transition-colors"
+                        >
+                          <Edit3 size={13} /> Sửa bánh
+                        </button>
+                      </div>
+                      <button onClick={() => handleDeleteProduct(p.id, p.name)} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg cursor-pointer" title="Xóa bánh">
                         <Trash2 size={15} />
                       </button>
                     </div>
@@ -878,6 +942,146 @@ export default function AdminDashboard() {
                 </div>
               ))}
             </div>
+
+            {/* Edit Product Modal */}
+            {editingId && editForm && (
+              <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-xs animate-fadeIn">
+                <div className="bg-white rounded-3xl max-w-2xl w-full p-6 md:p-8 max-h-[90vh] overflow-y-auto shadow-2xl border border-brand/20">
+                  <div className="flex items-center justify-between mb-5 pb-3 border-b border-gray-100">
+                    <h3 className="text-lg font-bold text-brand-choco font-serif flex items-center gap-2">
+                      <Edit3 size={18} className="text-brand" /> Chỉnh Sửa Vị Bánh ({editForm.name})
+                    </h3>
+                    <button 
+                      onClick={() => { setEditingId(null); setEditForm(null); }}
+                      className="text-gray-400 hover:text-gray-700 p-1 cursor-pointer"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">Tên vị bánh *</label>
+                        <input
+                          type="text"
+                          value={editForm.name}
+                          onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brand focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">Giá niêm yết</label>
+                        <input
+                          type="text"
+                          value={editForm.price || "35.000đ"}
+                          onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brand focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">Phân loại / Danh mục</label>
+                        <input
+                          type="text"
+                          value={editForm.category || "Bộ sưu tập"}
+                          onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brand focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">Tông màu nền thẻ bánh</label>
+                        <input
+                          type="text"
+                          value={editForm.color}
+                          onChange={(e) => setEditForm({ ...editForm, color: e.target.value })}
+                          placeholder="VD: bg-[#FDF8E1]"
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brand focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Mô tả ngắn cảm xúc</label>
+                      <input
+                        type="text"
+                        value={editForm.desc}
+                        onChange={(e) => setEditForm({ ...editForm, desc: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brand focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Thành phần nguyên liệu</label>
+                      <input
+                        type="text"
+                        value={editForm.ingredients || ""}
+                        onChange={(e) => setEditForm({ ...editForm, ingredients: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brand focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Hình ảnh bánh</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={editForm.image || ""}
+                          onChange={(e) => setEditForm({ ...editForm, image: e.target.value })}
+                          placeholder="Link ảnh hoặc bấm Tải ảnh từ máy"
+                          className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brand focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => triggerImageUpload("edit_product")}
+                          className="px-4 py-2.5 bg-brand-vanilla hover:bg-brand hover:text-white text-brand-choco rounded-xl text-xs font-bold cursor-pointer transition-colors flex items-center gap-1.5 shrink-0"
+                        >
+                          <Upload size={14} /> Tải ảnh từ máy
+                        </button>
+                      </div>
+                      {editForm.image && (
+                        <div className="mt-3 flex items-center gap-3 p-3 bg-brand-vanilla/40 rounded-2xl border border-brand/20">
+                          <img src={editForm.image} alt="Xem trước" className="w-16 h-16 rounded-xl object-cover" />
+                          <div className="text-xs text-gray-600">
+                            <span className="font-bold text-brand-choco block">Xem trước ảnh bánh</span>
+                            <span>Ảnh sẽ hiển thị sắc nét ngoài trang bộ sưu tập và trang chi tiết sản phẩm</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Mô tả chi tiết / Câu chuyện hương vị</label>
+                      <textarea
+                        rows={3}
+                        value={editForm.fullDesc || editForm.desc}
+                        onChange={(e) => setEditForm({ ...editForm, fullDesc: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brand focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-3 border-t border-gray-100">
+                      <button
+                        onClick={() => { setEditingId(null); setEditForm(null); }}
+                        className="px-4 py-2 rounded-xl border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50 cursor-pointer"
+                      >
+                        Hủy
+                      </button>
+                      <button
+                        onClick={saveEditProduct}
+                        className="px-6 py-2 bg-brand hover:bg-brand-dark text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer"
+                      >
+                        Lưu Thay Đổi
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -1412,6 +1616,16 @@ export default function AdminDashboard() {
 
                   <div className="flex items-center gap-2 shrink-0">
                     <button
+                      onClick={() => {
+                        setEditingBlogId(b.id);
+                        setEditBlogForm({ ...b });
+                      }}
+                      className="p-2 rounded-xl text-brand hover:bg-brand-vanilla/50 text-xs font-bold flex items-center gap-1 cursor-pointer border border-brand/20 bg-brand-vanilla/20"
+                      title="Chỉnh sửa bài viết"
+                    >
+                      <Edit3 size={14} /> Sửa bài
+                    </button>
+                    <button
                       onClick={() => triggerImageUpload(`blog_${b.id}`)}
                       className="p-2 rounded-xl text-gray-400 hover:text-brand hover:bg-brand-vanilla/30 text-xs font-bold flex items-center gap-1 cursor-pointer"
                       title="Đổi ảnh"
@@ -1429,6 +1643,136 @@ export default function AdminDashboard() {
                 </div>
               ))}
             </div>
+
+            {/* Edit Blog Modal */}
+            {editingBlogId && editBlogForm && (
+              <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-xs animate-fadeIn">
+                <div className="bg-white rounded-3xl max-w-2xl w-full p-6 md:p-8 max-h-[90vh] overflow-y-auto shadow-2xl border border-brand/20">
+                  <div className="flex items-center justify-between mb-5 pb-3 border-b border-gray-100">
+                    <h3 className="text-lg font-bold text-brand-choco font-serif flex items-center gap-2">
+                      <Edit3 size={18} className="text-brand" /> Chỉnh Sửa Bài Viết Sau Lớp Vỏ
+                    </h3>
+                    <button 
+                      onClick={() => { setEditingBlogId(null); setEditBlogForm(null); }}
+                      className="text-gray-400 hover:text-gray-700 p-1 cursor-pointer"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Tiêu đề bài viết *</label>
+                      <input
+                        type="text"
+                        value={editBlogForm.title}
+                        onChange={(e) => setEditBlogForm({ ...editBlogForm, title: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brand focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">Chuyên mục</label>
+                        <select
+                          value={editBlogForm.category}
+                          onChange={(e) => setEditBlogForm({ ...editBlogForm, category: e.target.value as any })}
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brand focus:outline-none bg-white"
+                        >
+                          <option value="Kỹ thuật">Kỹ thuật</option>
+                          <option value="Nguyên liệu">Nguyên liệu</option>
+                          <option value="Cảm xúc">Cảm xúc</option>
+                          <option value="Sự kiện">Sự kiện</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">Thời gian đọc</label>
+                        <input
+                          type="text"
+                          value={editBlogForm.readTime}
+                          onChange={(e) => setEditBlogForm({ ...editBlogForm, readTime: e.target.value })}
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brand focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Tác giả</label>
+                      <input
+                        type="text"
+                        value={editBlogForm.author || "Thợ bánh Treat Sweet"}
+                        onChange={(e) => setEditBlogForm({ ...editBlogForm, author: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brand focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Ảnh bìa bài viết</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={editBlogForm.image}
+                          onChange={(e) => setEditBlogForm({ ...editBlogForm, image: e.target.value })}
+                          className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brand focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => triggerImageUpload("edit_blog")}
+                          className="px-4 py-2.5 bg-brand-vanilla hover:bg-brand hover:text-white text-brand-choco rounded-xl text-xs font-bold cursor-pointer transition-colors flex items-center gap-1.5 shrink-0"
+                        >
+                          <Upload size={14} /> Tải ảnh từ máy
+                        </button>
+                      </div>
+                      {editBlogForm.image && (
+                        <div className="mt-3 flex items-center gap-3 p-3 bg-brand-vanilla/40 rounded-2xl border border-brand/20">
+                          <img src={editBlogForm.image} alt="Xem trước" className="w-16 h-16 rounded-xl object-cover" />
+                          <div className="text-xs text-gray-600">
+                            <span className="font-bold text-brand-choco block">Xem trước ảnh bài viết</span>
+                            <span>Ảnh sẽ hiển thị ngoài trang chủ và trang /blog</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Tóm tắt ngắn (Excerpt) *</label>
+                      <textarea
+                        rows={2}
+                        value={editBlogForm.excerpt}
+                        onChange={(e) => setEditBlogForm({ ...editBlogForm, excerpt: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brand focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Nội dung chi tiết bài viết *</label>
+                      <textarea
+                        rows={6}
+                        value={editBlogForm.content}
+                        onChange={(e) => setEditBlogForm({ ...editBlogForm, content: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm leading-relaxed focus:border-brand focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-3 border-t border-gray-100">
+                      <button
+                        onClick={() => { setEditingBlogId(null); setEditBlogForm(null); }}
+                        className="px-4 py-2 rounded-xl border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50 cursor-pointer"
+                      >
+                        Hủy
+                      </button>
+                      <button
+                        onClick={saveEditBlog}
+                        className="px-6 py-2 bg-brand hover:bg-brand-dark text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer"
+                      >
+                        Lưu Thay Đổi Bài Viết
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -1767,6 +2111,28 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
+
+      {/* Floating Quick Publish Banner */}
+      {hasUnpublishedChanges && (
+        <div className="fixed bottom-6 right-6 z-50 bg-[#2D2A26] text-white p-4 sm:p-5 rounded-3xl shadow-2xl border border-white/20 flex flex-col sm:flex-row items-start sm:items-center gap-3.5 animate-fadeIn max-w-md">
+          <div className="flex-1">
+            <p className="text-xs font-bold flex items-center gap-1.5 text-amber-300">
+              <Sparkles size={14} className="text-amber-300 animate-spin" /> Có nội dung mới vừa lưu!
+            </p>
+            <p className="text-[11px] text-gray-300 mt-0.5 leading-snug">
+              Bấm xuất bản để cập nhật vĩnh viễn lên GitHub & Vercel cho tất cả khách hàng cùng thấy.
+            </p>
+          </div>
+          <button
+            onClick={handlePublishToLive}
+            disabled={isPublishing}
+            className="w-full sm:w-auto px-5 py-2.5 bg-brand hover:bg-brand-dark text-white rounded-xl text-xs font-black shadow-lg cursor-pointer transition-all disabled:opacity-50 whitespace-nowrap flex items-center justify-center gap-1.5"
+          >
+            <Send size={13} />
+            {isPublishing ? "Đang xuất bản..." : "Xuất Bản Lên Web Ngay"}
+          </button>
+        </div>
+      )}
 
       </main>
     </div>
