@@ -5,12 +5,14 @@ import Link from "next/link";
 import { Coffee, Heart, Gift, BookOpen, Send, ShoppingCart, Check, ArrowRight, Eye } from "lucide-react";
 import { INITIAL_PRODUCTS, Product, STORAGE_KEY } from "@/data/products";
 import { DEFAULT_BANNER, BannerConfig, BANNER_STORAGE_KEY } from "@/data/banner";
+import { DEFAULT_SITE_CONTENT, SiteContent, SITE_CONTENT_STORAGE_KEY } from "@/data/siteContent";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [banner, setBanner] = useState<BannerConfig>(DEFAULT_BANNER);
+  const [siteContent, setSiteContent] = useState<SiteContent>(DEFAULT_SITE_CONTENT);
 
   const { addToCart, setIsCartOpen } = useCart();
   const { language, t } = useLanguage();
@@ -47,6 +49,22 @@ export default function Home() {
       const savedBanner = localStorage.getItem(BANNER_STORAGE_KEY);
       if (savedBanner) {
         setBanner(JSON.parse(savedBanner));
+      }
+    } catch {
+      // fallback
+    }
+
+    // Load site content (Blog, Custom Box, About, Contact)
+    try {
+      const savedContent = localStorage.getItem(SITE_CONTENT_STORAGE_KEY);
+      if (savedContent) {
+        const parsed = JSON.parse(savedContent);
+        setSiteContent({
+          blogs: parsed.blogs || DEFAULT_SITE_CONTENT.blogs,
+          customBox: parsed.customBox || DEFAULT_SITE_CONTENT.customBox,
+          about: parsed.about || DEFAULT_SITE_CONTENT.about,
+          contact: parsed.contact || DEFAULT_SITE_CONTENT.contact,
+        });
       }
     } catch {
       // fallback
@@ -220,7 +238,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Sau Lớp Vỏ (Blog Snippets) */}
+      {/* Sau Lớp Vỏ (Blog Snippets) - Dynamic from SiteContent */}
       <section className="py-20 px-4 bg-brand-taro/20">
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12">
@@ -234,51 +252,63 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-8 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
-              <span className="text-xs font-bold text-brand uppercase tracking-wider">Kỹ thuật & Cảm xúc</span>
-              <h3 className="text-xl font-bold text-brand-choco mt-2 mb-3 font-serif">Bí mật của chiếc viền chân ren (Pied) hoàn hảo</h3>
-              <p className="text-brand-choco/70 text-sm leading-relaxed mb-6">
-                Chân ren không chỉ là dấu hiệu của một chiếc macaron đạt chuẩn kỹ thuật, mà còn là kết tinh của sự kiên nhẫn khi hong khô vỏ bánh dưới nhiệt độ và độ ẩm khắt khe.
-              </p>
-              <Link href="/blog" className="text-sm font-semibold text-brand-choco hover:text-brand">Đọc tiếp &rarr;</Link>
-            </div>
-
-            <div className="bg-white p-8 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
-              <span className="text-xs font-bold text-brand uppercase tracking-wider">Nguyên liệu</span>
-              <h3 className="text-xl font-bold text-brand-choco mt-2 mb-3 font-serif">Hành trình tìm kiếm quả Vani Bourbon Madagascar</h3>
-              <p className="text-brand-choco/70 text-sm leading-relaxed mb-6">
-                Tại sao chúng mình từ chối hương liệu vani nhân tạo để theo đuổi những quả vani đen bóng được thụ phấn thủ công từ bờ bên kia Ấn Độ Dương?
-              </p>
-              <Link href="/blog" className="text-sm font-semibold text-brand-choco hover:text-brand">Đọc tiếp &rarr;</Link>
-            </div>
+            {siteContent.blogs.slice(0, 2).map((b) => (
+              <div key={b.id} className="bg-white p-8 rounded-3xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+                <div>
+                  <span className="text-xs font-bold text-brand uppercase tracking-wider">{b.category}</span>
+                  <h3 className="text-xl font-bold text-brand-choco mt-2 mb-3 font-serif group-hover:text-brand transition-colors">
+                    {b.title}
+                  </h3>
+                  <p className="text-brand-choco/70 text-sm leading-relaxed mb-6 line-clamp-3">
+                    {b.excerpt}
+                  </p>
+                </div>
+                <Link href="/blog" className="text-sm font-semibold text-brand-choco hover:text-brand flex items-center gap-1">
+                  Đọc tiếp &rarr;
+                </Link>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Custom Gift Box */}
+      {/* Custom Gift Box - Dynamic from SiteContent */}
       <section id="custom" className="py-20 px-4 bg-[#FFFCF9]">
         <div className="container mx-auto max-w-4xl text-center">
           <div className="inline-block p-4 rounded-full bg-brand-vanilla mb-6">
             <Gift className="text-brand" size={32} />
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-brand-choco mb-6 font-serif">Tự Tay Mix Hộp Quà Theo Cảm Xúc</h2>
-          <p className="text-brand-choco/80 text-lg mb-8 max-w-2xl mx-auto">
-            Dành tặng bản thân hoặc người thương một hộp macaron mang thông điệp riêng. Chọn 6 hoặc 12 nốt hương bạn yêu thích kèm thiệp viết tay nắn nót.
+          <h2 className="text-3xl md:text-4xl font-bold text-brand-choco mb-4 font-serif">
+            {siteContent.customBox.title}
+          </h2>
+          <p className="text-brand-choco/80 text-base md:text-lg mb-6 max-w-2xl mx-auto leading-relaxed">
+            {siteContent.customBox.subtitle}
           </p>
+          
+          {/* Price Badges for 6 & 12 box */}
+          <div className="flex justify-center gap-4 mb-8">
+            <span className="bg-white border border-brand/20 px-4 py-2 rounded-2xl text-xs md:text-sm font-bold text-brand-choco shadow-xs">
+              Hộp 6 vị: <span className="text-brand">{siteContent.customBox.box6Price}</span>
+            </span>
+            <span className="bg-white border border-brand/20 px-4 py-2 rounded-2xl text-xs md:text-sm font-bold text-brand-choco shadow-xs">
+              Hộp 12 vị: <span className="text-brand">{siteContent.customBox.box12Price}</span> (Freeship)
+            </span>
+          </div>
+
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button 
               onClick={() => setIsCartOpen(true)}
               className="bg-brand text-white px-8 py-3.5 rounded-full font-bold hover:bg-brand-dark transition-colors shadow-sm cursor-pointer"
             >
-              Mở giỏ hàng & Mix vị bánh
+              Mở giỏ hàng & Chọn vị bánh
             </button>
             <a 
-              href="https://zalo.me/0909123456" 
+              href={siteContent.customBox.zaloLink || "https://zalo.me/0909123456"} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="bg-white text-brand-choco border border-brand-choco/20 px-8 py-3.5 rounded-full font-bold hover:bg-brand-choco hover:text-white transition-colors"
+              className="bg-white text-brand-choco border border-brand-choco/20 px-8 py-3.5 rounded-full font-bold hover:bg-brand-choco hover:text-white transition-colors cursor-pointer"
             >
-              Nhắn tin đặt hộp thiết kế riêng
+              Nhắn Zalo đặt hộp quà riêng
             </a>
           </div>
         </div>
