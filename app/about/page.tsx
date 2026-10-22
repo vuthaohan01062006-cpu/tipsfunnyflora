@@ -57,8 +57,8 @@ export default function AboutPage() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center bg-white p-8 md:p-12 rounded-[2.5rem] border border-brand-vanilla shadow-sm">
           <div className="md:col-span-5 rounded-3xl overflow-hidden aspect-square bg-[#FAF5EE]">
             <img
-              src="https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85"
-              alt="Treat Sweet Story"
+              src={about.image || "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85"}
+              alt={about.title || "Treat Sweet Story"}
               className="w-full h-full object-cover"
             />
           </div>

@@ -85,10 +85,20 @@ export default function SeasonalProductDetailPage() {
     setIsCheckoutOpen(true);
   };
 
-  const handleCopyLink = () => {
-    if (typeof window !== "undefined") {
+  const handleShare = (platform: string) => {
+    if (typeof window === "undefined") return;
+    const url = encodeURIComponent(window.location.href);
+    const title = encodeURIComponent(`${product.name} - Treat Sweet Macaron`);
+
+    if (platform === "facebook") {
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, "_blank");
+    } else if (platform === "linkedin") {
+      window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, "_blank");
+    } else if (platform === "pinterest") {
+      window.open(`https://pinterest.com/pin/create/button/?url=${url}&description=${title}`, "_blank");
+    } else {
       navigator.clipboard.writeText(window.location.href);
-      setToastMessage("Đã sao chép liên kết sản phẩm vào bộ nhớ tạm!");
+      setToastMessage("Đã sao chép liên kết bánh vào bộ nhớ!");
       setTimeout(() => setToastMessage(null), 3000);
     }
   };
@@ -117,67 +127,56 @@ export default function SeasonalProductDetailPage() {
       )}
 
       {/* Top Breadcrumb Bar */}
-      <div className="bg-[#FFFFF0] border-b border-[#fafc97] py-3.5 px-4 shadow-2xs">
-        <div className="container mx-auto flex items-center text-xs text-gray-700 space-x-2">
-          <Link href="/" className="hover:text-brand font-medium transition-colors">
+      <div className="bg-[#FCEAD2] border-b border-[#F7D8B5] py-3 px-6 md:px-12 mb-8">
+        <div className="container mx-auto max-w-6xl flex items-center gap-2 text-xs md:text-sm text-brand-choco/80 font-medium">
+          <Link href="/" className="hover:text-brand transition-colors">
             {t("detail.breadcrumbHome") || "Trang chủ"}
           </Link>
-          <span className="text-gray-400">/</span>
-          <Link href="/seasonal" className="hover:text-brand font-medium transition-colors flex items-center gap-1">
-            <Sparkles size={12} className="text-amber-600" />
-            <span>BST Theo Mùa</span>
+          <span className="text-brand-choco/40 font-normal">/</span>
+          <Link href="/seasonal" className="hover:text-brand transition-colors">
+            {t("nav.seasonal") || "BST Theo Mùa"}
           </Link>
-          <span className="text-gray-400">/</span>
-          <span className="text-brand-choco font-bold truncate max-w-[220px] sm:max-w-none">
+          <span className="text-brand-choco/40 font-normal">/</span>
+          <span className="text-brand-choco font-bold">
             {product.name}
           </span>
         </div>
       </div>
 
-      {/* Main Product Section */}
-      <main className="container mx-auto px-4 py-8 md:py-12 max-w-6xl">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-start">
+      <div className="container mx-auto max-w-6xl px-4 md:px-6">
+        {/* Main Product Layout (Gallery on left, details on right) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start mb-20">
           
-          {/* Left Column: Vertical Thumbnails + Big Crisp Image */}
+          {/* LEFT COLUMN: Gallery with Vertical Thumbnails & Big Main Image */}
           <div className="lg:col-span-6 flex flex-col-reverse sm:flex-row gap-4 items-center sm:items-start">
             
-            {/* Vertical Thumbnails */}
-            <div className="flex sm:flex-col items-center gap-2.5 shrink-0 justify-center">
+            {/* Vertical Thumbnail Column with Up/Down Chevrons */}
+            <div className="flex sm:flex-col gap-2.5 justify-center items-center w-full sm:w-20 shrink-0 overflow-x-auto sm:overflow-visible py-1">
               <button 
                 onClick={() => {
                   const currentIndex = imageGallery.indexOf(activeImage);
                   const prevIndex = (currentIndex - 1 + imageGallery.length) % imageGallery.length;
                   setActiveImage(imageGallery[prevIndex]);
                 }}
-                className="hidden sm:flex text-gray-400 hover:text-brand p-1 cursor-pointer transition-colors"
-                aria-label="Previous thumbnail"
+                className="hidden sm:flex w-full items-center justify-center text-gray-500 hover:text-brand py-1 transition-colors cursor-pointer"
+                title="Ảnh trước"
               >
                 <ChevronUp size={22} />
               </button>
 
-              <div className="flex sm:flex-col gap-2.5 overflow-x-auto sm:overflow-visible pb-2 sm:pb-0">
-                {imageGallery.slice(0, 4).map((img, idx) => {
-                  const isSelected = activeImage === img;
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveImage(img)}
-                      className={`relative w-16 h-16 rounded-2xl overflow-hidden border-2 transition-all cursor-pointer shrink-0 ${
-                        isSelected 
-                          ? "border-brand shadow-md scale-105" 
-                          : "border-gray-200/80 hover:border-brand/40 opacity-75 hover:opacity-100"
-                      }`}
-                    >
-                      <img 
-                        src={img} 
-                        alt={`${product.name} thumbnail ${idx + 1}`}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    </button>
-                  );
-                })}
-              </div>
+              {imageGallery.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveImage(img)}
+                  className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
+                    activeImage === img 
+                      ? "border-brand shadow-md scale-105" 
+                      : "border-gray-200 hover:border-brand/40 opacity-70 hover:opacity-100"
+                  }`}
+                >
+                  <img src={img} alt={`${product.name} thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
 
               <button 
                 onClick={() => {
@@ -185,112 +184,110 @@ export default function SeasonalProductDetailPage() {
                   const nextIndex = (currentIndex + 1) % imageGallery.length;
                   setActiveImage(imageGallery[nextIndex]);
                 }}
-                className="hidden sm:flex text-gray-400 hover:text-brand p-1 cursor-pointer transition-colors"
-                aria-label="Next thumbnail"
+                className="hidden sm:flex w-full items-center justify-center text-gray-500 hover:text-brand py-1 transition-colors cursor-pointer"
+                title="Ảnh tiếp"
               >
                 <ChevronDown size={22} />
               </button>
             </div>
 
-            {/* Main Crisp Image */}
-            <div className={`relative flex-1 aspect-square w-full max-w-[480px] rounded-3xl overflow-hidden shadow-lg border border-orange-100/80 ${product.color || "bg-amber-50"}`}>
-              <img 
-                src={activeImage} 
+            {/* Big Main Image (Crisp, High Quality, Rounded Corners) */}
+            <div className="flex-1 w-full bg-[#FAF5EE] rounded-3xl overflow-hidden shadow-lg border border-brand-vanilla/60 aspect-square sm:aspect-[4/4.2] relative group">
+              <img
+                src={activeImage || product.image}
                 alt={product.name}
-                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
+              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-xs p-2.5 rounded-full shadow-sm text-brand hover:scale-110 transition-transform cursor-pointer">
+                <Heart size={20} className="fill-brand/20" />
+              </div>
               <div className="absolute top-4 left-4 z-10 flex gap-2">
                 <span className="bg-amber-900/90 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm flex items-center gap-1">
                   <Sparkles size={12} className="text-amber-300" />
-                  <span>{product.seasonTag}</span>
+                  <span>{product.seasonTag || "Theo Mùa"}</span>
                 </span>
-                {product.isNew && (
-                  <span className="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
-                    Mới
-                  </span>
-                )}
               </div>
             </div>
           </div>
 
-          {/* Right Column: Title, Price, Description & Purchase Card */}
-          <div className="lg:col-span-6 flex flex-col space-y-5">
+          {/* RIGHT COLUMN: Badges, Name, Price, Ingredients, Description, Structure, Purchase Box, Share */}
+          <div className="lg:col-span-6 flex flex-col justify-start">
             
-            {/* Badges & Category */}
-            <div className="flex items-center gap-2">
-              <span className="bg-red-500 text-white text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full tracking-wider shadow-xs">
-                HOT
+            {/* Badges: Hot & Mới & Season Tag */}
+            <div className="flex items-center gap-2 mb-3">
+              <span className="bg-[#BA3826] text-white text-[11px] font-bold px-3 py-1 rounded-md uppercase tracking-wider shadow-xs">
+                {t("detail.hotBadge") || "HOT"}
               </span>
-              <span className="bg-amber-100 text-amber-900 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-amber-300">
-                Phiên bản giới hạn
+              <span className="bg-[#E8B15D] text-white text-[11px] font-bold px-3 py-1 rounded-md uppercase tracking-wider shadow-xs">
+                {t("detail.newBadge") || "MỚI"}
               </span>
-              <span className="text-xs text-gray-500 uppercase tracking-widest font-semibold ml-1">
-                {product.category || "BST Theo Mùa"}
+              <span className="bg-amber-100 text-amber-900 text-[11px] font-bold px-3 py-1 rounded-md border border-amber-300">
+                {product.seasonTag || "BST Theo Mùa 🍂"}
               </span>
             </div>
 
             {/* Product Title */}
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-brand-choco font-serif tracking-tight leading-tight">
+            <h1 className="text-3xl md:text-4xl font-bold font-serif text-[#0B192C] mb-2 leading-tight">
               {product.name}
             </h1>
 
-            {/* Price with VAT note */}
-            <div className="flex items-baseline gap-2 flex-wrap">
-              <span className="text-2xl sm:text-3xl font-black text-red-600 tracking-tight font-sans">
-                {product.price || "42.000đ"}
-              </span>
-              {product.priceUnit && (
-                <span className="text-base sm:text-lg font-bold text-brand-choco/80 font-sans">
-                  / {product.priceUnit}
+            {/* Price & VAT (Large Red Font + Subtext) */}
+            <div className="mb-6">
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <span className="text-3xl md:text-4xl font-extrabold text-[#BA3826] font-serif">
+                  {product.price ? product.price.replace("đ", "VND") : "42,000VND"}
                 </span>
-              )}
-              <span className="text-xs text-gray-500 font-normal">
+                {product.priceUnit && (
+                  <span className="text-base sm:text-lg font-bold text-brand-choco/80 font-sans">
+                    / {product.priceUnit}
+                  </span>
+                )}
+              </div>
+              <div className="text-xs font-bold text-[#BA3826] mt-0.5">
                 {t("detail.vatNote") || "(Giá chưa bao gồm thuế VAT)"}
-              </span>
+              </div>
             </div>
 
-            {/* Ingredients Section */}
+            {/* Ingredients Line (Bold, No Header, Just Like Reference Image) */}
             {product.ingredients && (
-              <div className="bg-brand-vanilla/40 border border-brand/15 rounded-2xl p-4">
-                <h4 className="text-xs font-bold text-brand-choco uppercase tracking-wider mb-1.5">
-                  Thành phần nguyên liệu tuyển chọn theo mùa:
-                </h4>
-                <p className="text-xs sm:text-sm text-gray-700 leading-relaxed">
-                  {product.ingredients}
-                </p>
+              <div className="mb-4 text-sm md:text-base font-bold text-brand-choco leading-relaxed">
+                {product.ingredients}
               </div>
             )}
 
-            {/* Full Story Description */}
-            <div className="text-xs sm:text-sm text-gray-600 leading-relaxed space-y-2">
+            {/* Detailed Description Paragraph */}
+            <div className="mb-6 text-sm md:text-base text-brand-choco/85 leading-relaxed">
               <p>{product.fullDesc || product.desc}</p>
             </div>
 
-            {/* Macaron Structure */}
+            {/* Structure Layers (Cấu trúc bánh) */}
             {product.structure && product.structure.length > 0 && (
-              <div className="space-y-1.5 pt-2">
-                <h4 className="text-xs font-bold text-brand-choco uppercase tracking-wider">
-                  Cấu trúc tầng bánh:
-                </h4>
-                <ul className="text-xs text-gray-600 space-y-1 pl-4 list-disc marker:text-brand">
-                  {product.structure.map((item, index) => (
-                    <li key={index} className="leading-snug">{item}</li>
-                  ))}
-                </ul>
+              <div className="mb-6 text-sm text-brand-choco/90 space-y-1.5 leading-relaxed">
+                <div className="font-bold text-brand-choco mb-2">
+                  {t("detail.structureTitle") || "Cấu trúc bánh:"}
+                </div>
+                {product.structure.map((layer, lIdx) => (
+                  <div key={lIdx}>
+                    Lớp {lIdx + 1}: {layer.replace(/^Lớp \d+:\s*/i, "")}
+                  </div>
+                ))}
               </div>
             )}
 
-            {/* Purchase Card with Brand Pastel Palette */}
-            <div className="bg-[#FFFFF0] rounded-3xl p-5 sm:p-6 shadow-sm border-2 border-[#fafc97] mt-4 space-y-4">
+            {/* Subtle Divider Line */}
+            <div className="border-t border-gray-200/80 my-4" />
+
+            {/* PURCHASE ACTION BOX WITH BRAND PASTEL PALETTE */}
+            <div className="bg-[#FFFFF0] border-2 border-[#fafc97] p-4 md:p-5 rounded-2xl shadow-sm mb-6 space-y-3.5">
               
-              {/* Row 1: Quantity Selector + Add to Cart */}
+              {/* Row 1: Quantity selector + Add To Cart Button */}
               <div className="flex items-center gap-3">
-                {/* Quantity Counter */}
+                {/* Quantity Counter: [-] [ 1 ] [+] */}
                 <div className="flex items-center bg-white rounded-xl border border-gray-200 overflow-hidden shadow-xs h-12 shrink-0">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-[#404d9b] hover:bg-[#fafc97]/30 font-bold text-lg transition-colors cursor-pointer"
-                    aria-label="Decrease quantity"
+                    title="Giảm 1"
                   >
                     -
                   </button>
@@ -300,39 +297,41 @@ export default function SeasonalProductDetailPage() {
                   <button
                     onClick={() => setQuantity(quantity + 1)}
                     className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-[#404d9b] hover:bg-[#fafc97]/30 font-bold text-lg transition-colors cursor-pointer"
-                    aria-label="Increase quantity"
+                    title="Tăng 1"
                   >
                     +
                   </button>
                 </div>
 
-                {/* Add to Cart (Brand Navy #404d9b) */}
+                {/* Add to Cart Button (Brand Navy #404d9b) */}
                 <button
                   onClick={handleAddToCart}
                   className="flex-1 h-12 bg-[#404d9b] hover:bg-[#323d80] text-white rounded-xl font-bold text-sm md:text-base flex items-center justify-center gap-2.5 shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-98"
                 >
-                  <ShoppingBag size={18} />
                   <span>{t("detail.addToCartBtn") || "Thêm vào giỏ hàng"}</span>
+                  <ShoppingBag size={18} />
                 </button>
               </div>
 
-              {/* Row 2: Buy Now (#f17daa) + Consult Zalo (#23bbb7) */}
+              {/* Row 2: Buy Now (Brand Pink #f17daa) + Consult Zalo (Brand Teal #23bbb7) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Buy Now Button (Pastel Pink #f17daa) */}
                 <button
                   onClick={handleBuyNow}
                   className="h-12 bg-[#f17daa] hover:bg-[#e06896] text-white rounded-xl font-bold text-sm md:text-base flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-98"
                 >
                   <span>{t("detail.buyNowBtn") || "Mua ngay"}</span>
-                  <ArrowRight size={15} />
+                  <span className="text-base font-bold">→</span>
                 </button>
 
+                {/* Consult via Zalo (Pastel Teal #23bbb7) */}
                 <a
                   href="https://zalo.me/0909123456"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="h-12 bg-[#23bbb7] hover:bg-[#1da29e] text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg cursor-pointer"
                 >
-                  <span>{t("detail.contactZalo") || "Liên hệ tư vấn (Zalo)"}</span>
+                  <span>{t("detail.contactZalo") || "Tư vấn qua Zalo"}</span>
                   <span className="w-5 h-5 rounded-full bg-white text-[#23bbb7] text-[10px] flex items-center justify-center font-black tracking-tight shadow-xs">
                     Zalo
                   </span>
@@ -340,69 +339,98 @@ export default function SeasonalProductDetailPage() {
               </div>
             </div>
 
-            {/* Social Share Row */}
-            <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+            {/* Social Share Row (Exactly as in reference image) */}
+            <div className="flex items-center gap-3 pt-1">
+              <span className="text-xs font-bold text-brand-choco/80">
+                {t("detail.share") || "Chia sẻ:"}
+              </span>
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-gray-700">{t("detail.share") || "Chia sẻ"}:</span>
-                <button 
-                  onClick={handleCopyLink}
-                  className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600 hover:text-brand transition-colors cursor-pointer" 
+                <button
+                  onClick={() => handleShare("facebook")}
+                  className="w-8 h-8 rounded-md bg-white border border-gray-200 hover:border-blue-600 hover:text-blue-600 text-gray-700 flex items-center justify-center text-xs font-bold transition-colors cursor-pointer shadow-xs"
+                  title="Chia sẻ lên Facebook"
+                >
+                  f
+                </button>
+                <button
+                  onClick={() => handleShare("linkedin")}
+                  className="w-8 h-8 rounded-md bg-white border border-gray-200 hover:border-sky-700 hover:text-sky-700 text-gray-700 flex items-center justify-center text-xs font-bold transition-colors cursor-pointer shadow-xs"
+                  title="Chia sẻ lên LinkedIn"
+                >
+                  in
+                </button>
+                <button
+                  onClick={() => handleShare("pinterest")}
+                  className="w-8 h-8 rounded-md bg-white border border-gray-200 hover:border-red-600 hover:text-red-600 text-gray-700 flex items-center justify-center text-xs font-bold transition-colors cursor-pointer shadow-xs"
+                  title="Chia sẻ lên Pinterest"
+                >
+                  P
+                </button>
+                <button
+                  onClick={() => handleShare("copy")}
+                  className="w-8 h-8 rounded-md bg-white border border-gray-200 hover:border-brand hover:text-brand text-gray-700 flex items-center justify-center transition-colors cursor-pointer shadow-xs"
                   title="Sao chép liên kết"
                 >
-                  <Share2 size={16} />
+                  <Share2 size={13} />
                 </button>
               </div>
-
-              <Link href="/seasonal" className="text-xs font-bold text-brand hover:underline flex items-center gap-1">
-                ← Quay lại danh mục theo mùa
-              </Link>
             </div>
+
           </div>
         </div>
 
-        {/* Related Seasonal Flavors */}
+        {/* Bottom Section: Related Seasonal Flavors */}
         {relatedProducts.length > 0 && (
-          <div className="mt-16 md:mt-24 pt-12 border-t border-orange-100">
-            <div className="text-center max-w-xl mx-auto mb-8">
-              <span className="text-xs font-bold text-amber-700 uppercase tracking-widest bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
-                Phiên bản giới hạn khác
-              </span>
-              <h3 className="text-xl md:text-2xl font-bold text-brand-choco font-serif mt-2">
-                Các Nốt Hương Vị Theo Mùa Khác
-              </h3>
+          <div className="border-t border-brand-vanilla/60 pt-16">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-bold font-serif text-brand-choco">
+                Phiên Bản Giới Hạn Khác
+              </h2>
+              <Link href="/seasonal" className="text-xs font-bold text-brand hover:underline flex items-center gap-1">
+                Xem toàn bộ BST <ArrowRight size={14} />
+              </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {relatedProducts.slice(0, 3).map((rel) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {relatedProducts.slice(0, 4).map(rel => (
                 <Link
                   key={rel.id}
                   href={`/seasonal/${rel.id}`}
-                  className="group bg-white rounded-2xl overflow-hidden border border-orange-100/80 shadow-xs hover:shadow-lg transition-all p-4 flex gap-4 items-center hover:-translate-y-1"
+                  className="bg-white rounded-3xl p-4 border border-brand-vanilla hover:shadow-xl transition-all duration-300 group flex flex-col justify-between"
                 >
-                  <div className={`w-20 h-20 rounded-xl overflow-hidden shrink-0 ${rel.color || "bg-amber-50"}`}>
-                    <img 
-                      src={rel.image} 
-                      alt={rel.name} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  <div className="w-full aspect-square rounded-2xl overflow-hidden bg-brand-vanilla/40 mb-4">
+                    <img
+                      src={rel.image || rel.gallery?.[0]}
+                      alt={rel.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
-                      {rel.seasonTag}
+                  <div>
+                    <span className="text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 inline-block mb-1">
+                      {rel.seasonTag || "Theo Mùa"}
                     </span>
-                    <h4 className="text-sm font-bold text-brand-choco font-serif truncate mt-1 group-hover:text-brand transition-colors">
+                    <h3 className="font-bold font-serif text-brand-choco group-hover:text-brand transition-colors text-base mb-1">
                       {rel.name}
-                    </h4>
-                    <p className="text-xs font-extrabold text-red-600 mt-1 font-sans">
-                      {rel.price}
+                    </h3>
+                    <p className="text-xs text-brand-choco/70 line-clamp-2 mb-3">
+                      {rel.desc}
                     </p>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-gray-50">
+                    <span className="font-bold text-brand text-sm">
+                      {rel.price || "42.000đ"}
+                    </span>
+                    <span className="text-xs font-semibold text-brand-choco/60 group-hover:text-brand">
+                      Xem chi tiết →
+                    </span>
                   </div>
                 </Link>
               ))}
             </div>
           </div>
         )}
-      </main>
+
+      </div>
     </div>
   );
 }

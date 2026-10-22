@@ -52,7 +52,7 @@ import {
   X
 } from "lucide-react";
 
-type TabType = "banner" | "products" | "seasonal" | "blogs" | "customBox" | "about" | "contact";
+type TabType = "banner" | "products" | "seasonal" | "blogs" | "customBox" | "about" | "contact" | "media";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -163,14 +163,15 @@ export default function AdminDashboard() {
     try {
       const savedContent = localStorage.getItem(SITE_CONTENT_STORAGE_KEY);
       if (savedContent) {
+        const parsed = JSON.parse(savedContent);
         const loadedBlogs = (parsed.blogs && Array.isArray(parsed.blogs) && parsed.blogs.length >= DEFAULT_SITE_CONTENT.blogs.length)
           ? parsed.blogs
           : DEFAULT_SITE_CONTENT.blogs;
         setSiteContent({
           blogs: loadedBlogs,
-          customBox: parsed.customBox || DEFAULT_SITE_CONTENT.customBox,
-          about: parsed.about || DEFAULT_SITE_CONTENT.about,
-          contact: parsed.contact || DEFAULT_SITE_CONTENT.contact,
+          customBox: { ...DEFAULT_SITE_CONTENT.customBox, ...(parsed.customBox || {}) },
+          about: { ...DEFAULT_SITE_CONTENT.about, ...(parsed.about || {}) },
+          contact: { ...DEFAULT_SITE_CONTENT.contact, ...(parsed.contact || {}) },
         });
       } else {
         setSiteContent(DEFAULT_SITE_CONTENT);
@@ -391,6 +392,20 @@ export default function AdminDashboard() {
     } else if (uploadTargetId === "edit_blog") {
       setEditBlogForm(prev => prev ? { ...prev, image: base64Url } : null);
       showNotification("Đã cập nhật ảnh bìa cho bài viết đang chỉnh sửa!", "success");
+    } else if (uploadTargetId === "about_image") {
+      const updated = {
+        ...siteContent,
+        about: { ...siteContent.about, image: base64Url }
+      };
+      saveSiteContentToLocal(updated, "Về Chúng Mình");
+      showNotification("Đã cập nhật ảnh câu chuyện thương hiệu thành công!", "success");
+    } else if (uploadTargetId === "custombox_image") {
+      const updated = {
+        ...siteContent,
+        customBox: { ...siteContent.customBox, image: base64Url }
+      };
+      saveSiteContentToLocal(updated, "Hộp Quà Custom Box");
+      showNotification("Đã cập nhật ảnh minh họa hộp quà Custom Box!", "success");
     } else if (typeof uploadTargetId === "string" && uploadTargetId.startsWith("blog_")) {
       const bId = uploadTargetId.replace("blog_", "");
       const updatedBlogs = siteContent.blogs.map(b => 
@@ -817,6 +832,18 @@ export default function AdminDashboard() {
         
         {/* Navigation Tabs (Full CMS Menu) */}
         <div className="flex items-center gap-2 overflow-x-auto border-b border-gray-200 pb-4 mb-8">
+          <button
+            onClick={() => setActiveTab("media")}
+            className={`flex items-center gap-1.5 px-4 py-2.5 rounded-2xl font-bold text-xs md:text-sm transition-all shrink-0 cursor-pointer ${
+              activeTab === "media"
+                ? "bg-rose-600 text-white shadow-md font-extrabold ring-2 ring-rose-300"
+                : "bg-rose-50 text-rose-800 hover:bg-rose-100 border border-rose-200"
+            }`}
+          >
+            <ImageIcon size={16} />
+            <span>📸 Quản Lý Tất Cả Ảnh</span>
+          </button>
+
           <button
             onClick={() => setActiveTab("banner")}
             className={`flex items-center gap-1.5 px-4 py-2.5 rounded-2xl font-bold text-xs md:text-sm transition-all shrink-0 cursor-pointer ${
@@ -2286,6 +2313,36 @@ export default function AdminDashboard() {
                   />
                 </div>
 
+                <div className="md:col-span-2 bg-amber-50/50 p-4 rounded-2xl border border-amber-200/60">
+                  <label className="block text-xs font-bold text-amber-900 mb-2">Ảnh minh họa hộp quà Custom Box:</label>
+                  <div className="flex flex-col sm:flex-row items-center gap-4">
+                    {siteContent.customBox.image && (
+                      <div className="w-24 h-20 rounded-xl overflow-hidden bg-white border border-gray-200 shrink-0">
+                        <img src={siteContent.customBox.image} alt="Custom Box Preview" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                    <div className="flex-1 w-full flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Link ảnh hộp quà (URL)..."
+                        value={siteContent.customBox.image || ""}
+                        onChange={(e) => setSiteContent({
+                          ...siteContent,
+                          customBox: { ...siteContent.customBox, image: e.target.value }
+                        })}
+                        className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => triggerImageUpload("custombox_image")}
+                        className="px-4 py-2.5 bg-brand text-white rounded-xl text-xs font-bold hover:bg-brand-dark flex items-center gap-1.5 cursor-pointer shrink-0"
+                      >
+                        <Upload size={14} /> Tải từ máy
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-brand-choco/70 mb-2">Giá niêm yết Hộp 6 Bánh:</label>
                   <input
@@ -2397,6 +2454,36 @@ export default function AdminDashboard() {
                     })}
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm"
                   />
+                </div>
+
+                <div className="md:col-span-2 bg-amber-50/50 p-4 rounded-2xl border border-amber-200/60">
+                  <label className="block text-xs font-bold text-amber-900 mb-2">Ảnh câu chuyện thương hiệu (trang /about):</label>
+                  <div className="flex flex-col sm:flex-row items-center gap-4">
+                    {siteContent.about.image && (
+                      <div className="w-24 h-24 rounded-2xl overflow-hidden bg-white border border-gray-200 shrink-0">
+                        <img src={siteContent.about.image} alt="About Preview" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                    <div className="flex-1 w-full flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Link ảnh câu chuyện (URL)..."
+                        value={siteContent.about.image || ""}
+                        onChange={(e) => setSiteContent({
+                          ...siteContent,
+                          about: { ...siteContent.about, image: e.target.value }
+                        })}
+                        className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => triggerImageUpload("about_image")}
+                        className="px-4 py-2.5 bg-brand text-white rounded-xl text-xs font-bold hover:bg-brand-dark flex items-center gap-1.5 cursor-pointer shrink-0"
+                      >
+                        <Upload size={14} /> Tải từ máy
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="md:col-span-2">
@@ -2575,6 +2662,280 @@ export default function AdminDashboard() {
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ========================================================= */}
+        {/* TAB 8: QUẢN LÝ TẤT CẢ HÌNH ẢNH TRÊN WEB (MEDIA HUB) */}
+        {/* ========================================================= */}
+        {activeTab === "media" && (
+          <div className="space-y-8 animate-fadeIn">
+            {/* Header Banner */}
+            <div className="bg-gradient-to-r from-rose-500/10 via-amber-500/10 to-brand-vanilla p-6 md:p-8 rounded-3xl border border-rose-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-bold uppercase tracking-wider mb-2">
+                  <ImageIcon size={14} /> All-in-One Media Hub
+                </div>
+                <h2 className="text-xl md:text-2xl font-bold font-serif text-brand-choco mb-1">
+                  Trung Tâm Quản Lý Tất Cả Hình Ảnh Trên Website
+                </h2>
+                <p className="text-sm text-brand-choco/80 max-w-2xl leading-relaxed">
+                  Quản trị viên có thể xem trước và thay đổi nhanh bất kỳ hình ảnh nào xuất hiện trên toàn bộ website (Banner, About, Hộp quà, 7 Vị bánh, BST Mùa, Bài viết Blog) tại một nơi duy nhất.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Link 
+                  href="/" 
+                  target="_blank" 
+                  className="px-4 py-2 bg-white text-brand-choco rounded-xl border border-gray-200 text-xs font-bold hover:bg-gray-50 flex items-center gap-1.5 shadow-xs"
+                >
+                  Xem website <ExternalLink size={13} />
+                </Link>
+              </div>
+            </div>
+
+            {/* SECTION 1: BANNER & CORE BRAND IMAGES */}
+            <div className="space-y-4">
+              <h3 className="text-base font-bold text-brand-choco flex items-center gap-2 border-b border-gray-200 pb-2">
+                <LayoutTemplate size={18} className="text-brand" /> 1. Banner Trang Chủ & Trang Thương Hiệu
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* 1.1 Banner Hero Trang Chủ */}
+                <div className="bg-white p-5 rounded-3xl border border-gray-200 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-brand bg-brand-vanilla px-2.5 py-0.5 rounded-full">Trang Chủ (Hero)</span>
+                    </div>
+                    <h4 className="font-bold text-brand-choco text-sm mb-3">Banner Hero Macaron</h4>
+                    <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden bg-gray-100 border border-gray-200 mb-3">
+                      <img 
+                        src={banner.imageUrl || "/hero-macaron.png"} 
+                        alt="Banner Preview" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2 pt-2 border-t border-gray-100">
+                    <button
+                      onClick={() => triggerImageUpload("banner")}
+                      className="w-full py-2 bg-brand text-white rounded-xl text-xs font-bold hover:bg-brand-dark flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                    >
+                      <Upload size={14} /> Tải ảnh mới từ máy
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("banner")}
+                      className="w-full py-1.5 bg-gray-50 text-gray-700 rounded-xl text-xs font-medium hover:bg-gray-100 text-center cursor-pointer"
+                    >
+                      Chỉnh sửa link URL & nội dung →
+                    </button>
+                  </div>
+                </div>
+
+                {/* 1.2 Ảnh Câu Chuyện Thương Hiệu (/about) */}
+                <div className="bg-white p-5 rounded-3xl border border-gray-200 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">Trang /about</span>
+                    </div>
+                    <h4 className="font-bold text-brand-choco text-sm mb-3">Ảnh Câu Chuyện Thợ Bánh</h4>
+                    <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden bg-gray-100 border border-gray-200 mb-3">
+                      <img 
+                        src={siteContent.about.image || "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85"} 
+                        alt="About Preview" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2 pt-2 border-t border-gray-100">
+                    <button
+                      onClick={() => triggerImageUpload("about_image")}
+                      className="w-full py-2 bg-emerald-700 text-white rounded-xl text-xs font-bold hover:bg-emerald-800 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                    >
+                      <Upload size={14} /> Tải ảnh mới từ máy
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("about")}
+                      className="w-full py-1.5 bg-gray-50 text-gray-700 rounded-xl text-xs font-medium hover:bg-gray-100 text-center cursor-pointer"
+                    >
+                      Chỉnh sửa câu chuyện /about →
+                    </button>
+                  </div>
+                </div>
+
+                {/* 1.3 Ảnh Hộp Quà Custom Box */}
+                <div className="bg-white p-5 rounded-3xl border border-gray-200 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">Trang Chủ /#custom</span>
+                    </div>
+                    <h4 className="font-bold text-brand-choco text-sm mb-3">Ảnh Minh Họa Hộp Quà</h4>
+                    <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden bg-gray-100 border border-gray-200 mb-3">
+                      <img 
+                        src={siteContent.customBox.image || "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?auto=format&fit=crop&w=800&q=85"} 
+                        alt="Custom Box Preview" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2 pt-2 border-t border-gray-100">
+                    <button
+                      onClick={() => triggerImageUpload("custombox_image")}
+                      className="w-full py-2 bg-amber-600 text-white rounded-xl text-xs font-bold hover:bg-amber-700 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                    >
+                      <Upload size={14} /> Tải ảnh mới từ máy
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("customBox")}
+                      className="w-full py-1.5 bg-gray-50 text-gray-700 rounded-xl text-xs font-medium hover:bg-gray-100 text-center cursor-pointer"
+                    >
+                      Chỉnh sửa giá & chi tiết hộp quà →
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 2: 7 VỊ BÁNH MACARON & ALBUM GALLERIES */}
+            <div className="space-y-4 pt-6">
+              <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+                <h3 className="text-base font-bold text-brand-choco flex items-center gap-2">
+                  <Cookie size={18} className="text-brand" /> 2. Ảnh 7 Vị Bánh Truyền Thống ({products.length} vị)
+                </h3>
+                <span className="text-xs text-gray-500">Mỗi vị bánh có ảnh đại diện + Album ảnh chi tiết</span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                {products.map((p) => {
+                  const galleryCount = (p.gallery && p.gallery.length > 0) ? p.gallery.length : 1;
+                  return (
+                    <div key={p.id} className="bg-white p-3 rounded-2xl border border-gray-200 shadow-xs flex flex-col justify-between text-center group hover:shadow-md transition-all">
+                      <div>
+                        <div className="w-full aspect-square rounded-xl overflow-hidden bg-gray-100 mb-2 relative">
+                          <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                          <span className="absolute bottom-1 right-1 bg-black/70 backdrop-blur-xs text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md">
+                            {galleryCount} ảnh
+                          </span>
+                        </div>
+                        <h5 className="font-bold text-xs text-brand-choco truncate">{p.name}</h5>
+                        <p className="text-[11px] text-brand font-bold mt-0.5">{p.price || "35.000đ"}</p>
+                      </div>
+                      <div className="mt-2 space-y-1">
+                        <button
+                          onClick={() => triggerImageUpload(p.id)}
+                          className="w-full py-1 bg-brand-vanilla text-brand text-[10px] font-bold rounded-lg hover:bg-brand hover:text-white transition-colors cursor-pointer"
+                        >
+                          Đổi ảnh đại diện
+                        </button>
+                        <button
+                          onClick={() => {
+                            setActiveTab("products");
+                            startEditProduct(p);
+                          }}
+                          className="w-full py-1 bg-gray-50 text-gray-600 text-[10px] font-medium rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                        >
+                          Quản lý album ↗
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* SECTION 3: SẢN PHẨM THEO MÙA (SEASONAL) & ALBUM GALLERIES */}
+            <div className="space-y-4 pt-6">
+              <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+                <h3 className="text-base font-bold text-amber-900 flex items-center gap-2">
+                  <Sparkles size={18} className="text-amber-600" /> 3. Ảnh Sản Phẩm Theo Mùa ({seasonalProducts.length} bánh)
+                </h3>
+                <span className="text-xs text-gray-500">Mỗi bánh có ảnh đại diện + Album ảnh chi tiết</span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {seasonalProducts.map((s) => {
+                  const galleryCount = (s.gallery && s.gallery.length > 0) ? s.gallery.length : 1;
+                  return (
+                    <div key={s.id} className="bg-white p-3.5 rounded-2xl border border-amber-200 shadow-xs flex flex-col justify-between group hover:shadow-md transition-all">
+                      <div>
+                        <div className="w-full aspect-square rounded-xl overflow-hidden bg-amber-50 mb-2 relative">
+                          <img src={s.image} alt={s.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                          <span className="absolute top-1.5 left-1.5 bg-amber-900/80 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
+                            {s.seasonTag || "Mùa"}
+                          </span>
+                          <span className="absolute bottom-1 right-1 bg-black/70 backdrop-blur-xs text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md">
+                            {galleryCount} ảnh
+                          </span>
+                        </div>
+                        <h5 className="font-bold text-xs text-brand-choco truncate">{s.name}</h5>
+                        <p className="text-[11px] text-red-600 font-bold mt-0.5">{s.price || "42.000đ"}</p>
+                      </div>
+                      <div className="mt-2.5 space-y-1">
+                        <button
+                          onClick={() => triggerImageUpload(`seasonal_${s.id}`)}
+                          className="w-full py-1.5 bg-amber-100 text-amber-900 text-[11px] font-bold rounded-lg hover:bg-amber-600 hover:text-white transition-colors cursor-pointer"
+                        >
+                          Đổi ảnh đại diện
+                        </button>
+                        <button
+                          onClick={() => {
+                            setActiveTab("seasonal");
+                            startEditSeasonal(s);
+                          }}
+                          className="w-full py-1 bg-gray-50 text-gray-600 text-[10px] font-medium rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                        >
+                          Quản lý album ↗
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* SECTION 4: ẢNH BÌA BÀI VIẾT BLOG */}
+            <div className="space-y-4 pt-6">
+              <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+                <h3 className="text-base font-bold text-brand-choco flex items-center gap-2">
+                  <BookOpen size={18} className="text-brand" /> 4. Ảnh Bìa Các Bài Viết Blog Sau Lớp Vỏ ({siteContent.blogs.length} bài)
+                </h3>
+                <span className="text-xs text-gray-500">Hiển thị ngoài trang chủ và trang /blog</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {siteContent.blogs.map((b) => (
+                  <div key={b.id} className="bg-white p-3.5 rounded-2xl border border-gray-200 shadow-xs flex gap-3 items-center group hover:shadow-md transition-all">
+                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 shrink-0">
+                      <img src={b.image} alt={b.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[9px] font-bold text-brand bg-brand-vanilla px-2 py-0.5 rounded-full inline-block mb-1">
+                        {b.category}
+                      </span>
+                      <h5 className="font-bold text-xs text-brand-choco truncate leading-snug">{b.title}</h5>
+                      <div className="mt-2 flex gap-1.5">
+                        <button
+                          onClick={() => triggerImageUpload(`blog_${b.id}`)}
+                          className="py-1 px-2.5 bg-brand-vanilla text-brand text-[10px] font-bold rounded-lg hover:bg-brand hover:text-white transition-colors cursor-pointer"
+                        >
+                          Đổi ảnh bìa
+                        </button>
+                        <button
+                          onClick={() => {
+                            setActiveTab("blogs");
+                            startEditBlog(b);
+                          }}
+                          className="py-1 px-2 bg-gray-50 text-gray-600 text-[10px] font-medium rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                        >
+                          Sửa bài ↗
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           </div>
         )}
 

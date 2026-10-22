@@ -13,6 +13,7 @@ export interface BlogPost {
 export interface CustomBoxConfig {
   title: string;
   subtitle: string;
+  image?: string;
   box6Price: string;
   box12Price: string;
   description: string;
@@ -29,6 +30,7 @@ export interface AboutCommitment {
 export interface AboutConfig {
   title: string;
   subtitle: string;
+  image?: string;
   storyP1: string;
   storyP2: string;
   commitments: AboutCommitment[];
@@ -175,6 +177,7 @@ Mỗi hộp quà Custom Box tại Treat Sweet đều được dập kim nhũ và
   customBox: {
     title: "Tự Tay Mix Hộp Quà Theo Cảm Xúc",
     subtitle: "Dành tặng bản thân hoặc người thương một hộp macaron mang thông điệp riêng. Chọn 6 hoặc 12 nốt hương bạn yêu thích kèm thiệp viết tay nắn nót.",
+    image: "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?auto=format&fit=crop&w=800&q=85",
     box6Price: "210.000đ",
     box12Price: "410.000đ",
     description: "Hộp quà được thiết kế độc quyền từ giấy mỹ thuật pastel dập kim nhũ vàng, thắt nơ ruy băng lụa mềm mại và tặng kèm thiệp viết tay nhắn gửi lời thương.",
@@ -185,6 +188,7 @@ Mỗi hộp quà Custom Box tại Treat Sweet đều được dập kim nhũ và
   about: {
     title: "Về Treat Sweet Macaron",
     subtitle: "Small Treat, Sweet Day – Phần thưởng ngọt ngào xoa dịu những nhọc nhằn",
+    image: "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
     storyP1: "Treat Sweet Macaron ra đời từ một căn bếp nhỏ ngập tràn mùi bơ thơm và tiếng nhạc Pháp êm dịu. Chúng mình tin rằng, giữa nhịp sống hối hả và bộn bề lo toan, ai trong chúng ta cũng xứng đáng có được những giây phút được vỗ về dịu dàng bằng một chiếc bánh ngọt ngào thủ công chuẩn vị.",
     storyP2: "Không chạy theo sản xuất công nghiệp đại trà, mỗi chiếc bánh macaron tại Treat Sweet đều được nặn tay tỉ mỉ, canh chỉnh nhiệt độ lò nướng từng phút và tuyển chọn những nguyên liệu tự nhiên cao cấp nhất: từ bơ tươi Anchor Pháp, hạt hạnh nhân xay mịn, bột trà xanh Uji Kyoto đến quả vani Bourbon Madagascar nguyên chất.",
     commitments: [

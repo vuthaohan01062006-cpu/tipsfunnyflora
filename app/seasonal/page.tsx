@@ -209,18 +209,37 @@ export default function SeasonalPage() {
                 </div>
 
                 {/* Image Wrapper */}
-                <Link 
-                  href={`/seasonal/${flavor.id}`}
-                  className={`block relative aspect-square ${flavor.color || "bg-amber-50"} overflow-hidden cursor-pointer`}
-                >
-                  <img 
-                    src={flavor.image || "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=85"} 
-                    alt={flavor.name}
-                    className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-500 ease-out"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none" />
-                </Link>
+                <div className={`relative aspect-square ${flavor.color || "bg-amber-50"} overflow-hidden`}>
+                  <Link 
+                    href={`/seasonal/${flavor.id}`}
+                    className="block w-full h-full cursor-pointer"
+                  >
+                    <img 
+                      src={flavor.image || "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=85"} 
+                      alt={flavor.name}
+                      className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-500 ease-out"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none" />
+                  </Link>
+
+                  {/* Nút Xem chi tiết nhanh khi hover */}
+                  <Link
+                    href={`/seasonal/${flavor.id}`}
+                    className="absolute bottom-3.5 left-3.5 bg-white/95 backdrop-blur-xs text-brand-choco text-xs font-bold px-3 py-1.5 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 hover:text-brand z-10"
+                  >
+                    <Eye size={13} /> {t("flavors.viewDetail") || "Xem chi tiết"}
+                  </Link>
+
+                  {/* Nút giỏ hàng nổi góc dưới */}
+                  <button 
+                    className="absolute bottom-3.5 right-3.5 w-10 h-10 rounded-full bg-white/95 backdrop-blur-md text-brand-choco hover:bg-brand hover:text-white flex items-center justify-center transition-all shadow-lg group-hover:scale-110 active:scale-95 cursor-pointer z-10"
+                    title="Thêm vào giỏ hàng"
+                    onClick={(e) => handleAddToCart(flavor, e)}
+                  >
+                    <ShoppingCart size={16} />
+                  </button>
+                </div>
 
                 {/* Content Area */}
                 <div className="p-5 flex flex-col flex-grow bg-white">
