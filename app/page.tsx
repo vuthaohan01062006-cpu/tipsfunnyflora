@@ -51,44 +51,74 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Bộ Sưu Tập 7 Vị Bánh */}
+      {/* Bộ Sưu Tập 7 Vị Bánh (Hiển thị ảnh Canva sắc nét 100%) */}
       <section id="flavors" className="py-20 px-4 bg-white">
-        <div className="container mx-auto">
+        <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-brand-choco mb-4 font-serif">Bộ Sưu Tập Hương Vị</h2>
             <p className="text-brand-choco/60 max-w-xl mx-auto">Mỗi vị bánh là một lời nhắn nhủ, một cảm xúc được nâng niu. Hãy chọn cho mình một nốt hương đồng điệu.</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map(flavor => (
-              <div key={flavor.id} className={`${flavor.color} rounded-2xl p-8 flex flex-col justify-between h-64 shadow-sm hover:shadow-md transition-shadow group relative overflow-hidden`}>
-                {flavor.image && (
-                  <div className="absolute inset-0 z-0 opacity-25 group-hover:opacity-40 transition-opacity">
-                    <img src={flavor.image} alt={flavor.name} className="w-full h-full object-cover" />
-                  </div>
-                )}
-                <div className="relative z-10">
-                  <h3 className={`text-xl font-bold ${flavor.textColor || 'text-brand-choco'} mb-3`}>{flavor.name}</h3>
-                  <p className={`${flavor.textColor ? 'text-white/80' : 'text-brand-choco/70'} text-sm leading-relaxed`}>{flavor.desc}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {products.map((flavor) => {
+              const hasImage = Boolean(flavor.image);
+
+              return (
+                <div 
+                  key={flavor.id} 
+                  className={`${flavor.color} rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group relative flex flex-col justify-between`}
+                >
+                  {hasImage ? (
+                    /* Khi có ảnh Canva: Hiển thị 100% sắc nét, chuẩn tỉ lệ, không bị mờ đục hay đè chữ */
+                    <div className="relative w-full aspect-[4/5] overflow-hidden bg-white">
+                      <img 
+                        src={flavor.image} 
+                        alt={flavor.name} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                      />
+                      {/* Nút giỏ hàng nổi góc dưới */}
+                      <button 
+                        className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur-md text-brand-choco hover:bg-brand hover:text-white flex items-center justify-center transition-all shadow-md group-hover:scale-110"
+                        title="Thêm vào giỏ hàng"
+                        onClick={() => alert(`Đã thêm "${flavor.name}" vào giỏ hàng!`)}
+                      >
+                        <ShoppingCart size={18} />
+                      </button>
+                    </div>
+                  ) : (
+                    /* Khi chưa tải ảnh: Thẻ màu pastel thanh lịch */
+                    <div className="p-8 flex flex-col justify-between h-64">
+                      <div>
+                        <h3 className={`text-xl font-bold ${flavor.textColor || 'text-brand-choco'} mb-3`}>
+                          {flavor.name}
+                        </h3>
+                        <p className={`${flavor.textColor ? 'text-white/80' : 'text-brand-choco/70'} text-sm leading-relaxed`}>
+                          {flavor.desc}
+                        </p>
+                      </div>
+                      <div className="flex justify-end">
+                        <button 
+                          className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            flavor.textColor ? 'bg-white/20 text-white' : 'bg-white/50 text-brand-choco'
+                          } group-hover:scale-110 transition-transform`}
+                          title="Thêm vào giỏ hàng"
+                          onClick={() => alert(`Đã thêm "${flavor.name}" vào giỏ hàng!`)}
+                        >
+                          <ShoppingCart size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className="flex justify-end relative z-10">
-                  <button 
-                    className={`w-10 h-10 rounded-full flex items-center justify-center ${flavor.textColor ? 'bg-white/20 text-white' : 'bg-white/50 text-brand-choco'} group-hover:scale-110 transition-transform`}
-                    title="Chọn mua"
-                    onClick={() => alert(`Đã thêm "${flavor.name}" vào giỏ hàng!`)}
-                  >
-                    <ShoppingCart size={18} />
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* Sau Lớp Vỏ (Blog Snippets) */}
       <section className="py-20 px-4 bg-brand-taro/20">
-        <div className="container mx-auto">
+        <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12">
             <div>
               <h2 className="text-3xl font-bold text-brand-choco mb-4 font-serif">Sau Lớp Vỏ</h2>
@@ -100,19 +130,19 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <article className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow p-6">
+            <article className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow p-6">
               <span className="text-brand text-xs font-bold tracking-wider mb-2 block uppercase">Sự thật / Kỹ thuật</span>
               <h3 className="text-lg font-bold text-brand-choco mb-3">Vì sao macaron có giá thành tương đương một ly cà phê đặc sản?</h3>
               <p className="text-sm text-gray-500 mb-4 line-clamp-3">Cùng giải mã việc sử dụng 100% bột hạnh nhân nguyên chất thay vì pha trộn, và kỹ thuật tạo chân bánh (pied) đỏng đảnh của nghệ nhân...</p>
               <Link href="#" className="text-brand-choco text-sm font-medium hover:text-brand">Đọc tiếp &rarr;</Link>
             </article>
-            <article className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow p-6">
+            <article className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow p-6">
               <span className="text-brand text-xs font-bold tracking-wider mb-2 block uppercase">Hương vị</span>
               <h3 className="text-lg font-bold text-brand-choco mb-3">Phá bỏ hiểu lầm bánh ngọt gắt: Bí quyết cân bằng vị với ganache</h3>
               <p className="text-sm text-gray-500 mb-4 line-clamp-3">Macaron không hề gắt nếu phần nhân được làm từ ganache mộc bản thay vì kem bơ béo ngậy. Sự cân bằng độ chua - đắng - ngọt...</p>
               <Link href="#" className="text-brand-choco text-sm font-medium hover:text-brand">Đọc tiếp &rarr;</Link>
             </article>
-            <article className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow p-6">
+            <article className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow p-6">
               <span className="text-brand text-xs font-bold tracking-wider mb-2 block uppercase">Trải nghiệm</span>
               <h3 className="text-lg font-bold text-brand-choco mb-3">Quy tắc 10 phút vàng: Cách bảo quản và thưởng thức macaron trọn vị</h3>
               <p className="text-sm text-gray-500 mb-4 line-clamp-3">Để vỏ bánh giòn tan và nhân lạnh tan chảy hoàn hảo trên đầu lưỡi, hãy để bánh nghỉ 10 phút sau khi lấy khỏi tủ lạnh...</p>
