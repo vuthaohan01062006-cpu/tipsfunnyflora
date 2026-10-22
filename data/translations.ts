@@ -50,7 +50,7 @@ export const DICTIONARY: Translations = {
   "detail.breadcrumbProducts": { vi: "Sản phẩm", en: "Products" },
   "detail.hotBadge": { vi: "Hot", en: "Hot" },
   "detail.newBadge": { vi: "Mới", en: "New" },
-  "detail.vatNote": { vi: "(Giá chưa bao gồm thuế VAT)", en: "(Price excludes VAT)" },
+  "detail.vatNote": { vi: "", en: "" },
   "detail.ingredientsTitle": { vi: "Thành phần nguyên liệu tuyển chọn:", en: "Selected Premium Ingredients:" },
   "detail.structureTitle": { vi: "Cấu trúc bánh:", en: "Macaron Structure:" },
   "detail.quantity": { vi: "Số lượng:", en: "Quantity:" },

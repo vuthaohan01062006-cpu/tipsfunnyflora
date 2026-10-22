@@ -272,9 +272,6 @@ export default function SeasonalPage() {
                           </span>
                         )}
                       </div>
-                      <span className="text-[10px] text-gray-400 block -mt-0.5">
-                        (Chưa bao gồm VAT)
-                      </span>
                     </div>
 
                     <span className="text-[11px] font-medium text-amber-800 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200/60">
