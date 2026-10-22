@@ -80,7 +80,13 @@ export default function ProductDetailPage() {
     reloadProduct();
 
     window.addEventListener("storage", reloadProduct);
-    return () => window.removeEventListener("storage", reloadProduct);
+    window.addEventListener("focus", reloadProduct);
+    document.addEventListener("visibilitychange", reloadProduct);
+    return () => {
+      window.removeEventListener("storage", reloadProduct);
+      window.removeEventListener("focus", reloadProduct);
+      document.removeEventListener("visibilitychange", reloadProduct);
+    };
   }, [productId]);
 
   // Gallery thumbnails: Always puts the latest product.image first, followed by other gallery images

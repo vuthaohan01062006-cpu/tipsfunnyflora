@@ -490,10 +490,25 @@ export default function AdminDashboard() {
       setNewBlog(prev => ({ ...prev, image: base64Url }));
       showNotification("Đã chọn ảnh bìa cho bài viết Blog mới!", "success");
     } else if (currentTarget === "edit_product") {
-      setEditForm(prev => prev ? { 
-        ...prev, 
-        image: base64Url,
-      } : null);
+      setEditForm(prev => {
+        if (!prev) return null;
+        const currentGallery = (prev.gallery && prev.gallery.length > 0) ? prev.gallery : (prev.image ? [prev.image] : []);
+        return { 
+          ...prev, 
+          image: base64Url,
+          gallery: [base64Url, ...currentGallery.filter(g => g !== base64Url)],
+        };
+      });
+      if (editForm) {
+        const updated = products.map(p => 
+          String(p.id) === String(editForm.id) ? { 
+            ...p, 
+            image: base64Url,
+            gallery: [base64Url, ...(p.gallery || []).filter(g => g !== base64Url)],
+          } : p
+        );
+        saveProductsToLocal(updated);
+      }
       showNotification("Đã cập nhật ảnh đại diện vị bánh! Bấm 'Lưu thay đổi' phía dưới.", "success");
     } else if (currentTarget === "add_gallery_product") {
       setEditForm(prev => {
@@ -555,12 +570,44 @@ export default function AdminDashboard() {
       );
       saveSeasonalToLocal(updated);
       showNotification("Đã cập nhật ảnh bánh theo mùa thành công! Hãy bấm 'Xuất bản lên Web'.", "success");
+    } else if (
+      (typeof currentTarget === "string" && currentTarget.startsWith("product_")) ||
+      products.some(p => String(p.id) === String(currentTarget))
+    ) {
+      const pId = typeof currentTarget === "string" && currentTarget.startsWith("product_")
+        ? currentTarget.replace("product_", "")
+        : String(currentTarget);
+
+      const updated = products.map(p => {
+        if (String(p.id) === pId) {
+          const currentGallery = (p.gallery && p.gallery.length > 0) ? p.gallery : (p.image ? [p.image] : []);
+          return {
+            ...p,
+            image: base64Url,
+            gallery: [base64Url, ...currentGallery.filter(g => g !== base64Url)],
+          };
+        }
+        return p;
+      });
+
+      saveProductsToLocal(updated);
+
+      if (editForm && String(editForm.id) === pId) {
+        setEditForm(prev => prev ? {
+          ...prev,
+          image: base64Url,
+          gallery: [base64Url, ...(prev.gallery || []).filter(g => g !== base64Url)],
+        } : null);
+      }
+
+      showNotification("Đã cập nhật ảnh vị bánh thành công! Hãy bấm 'Xuất bản lên Web'.", "success");
     } else {
       const targetStr = String(currentTarget);
       const updated = products.map(p => 
         String(p.id) === targetStr ? { 
           ...p, 
           image: base64Url,
+          gallery: [base64Url, ...(p.gallery || []).filter(g => g !== base64Url)],
         } : p
       );
       saveProductsToLocal(updated);
@@ -661,13 +708,23 @@ export default function AdminDashboard() {
 
   const handleDeleteProduct = (id: string | number, name: string) => {
     if (confirm(`Bạn có chắc muốn xóa bánh "${name}" không?`)) {
-      saveProductsToLocal(products.filter(p => p.id !== id));
+      saveProductsToLocal(products.filter(p => String(p.id) !== String(id)));
     }
+  };
+
+  const startEditProduct = (p: Product) => {
+    setEditingId(p.id);
+    setEditForm({ ...p });
+  };
+
+  const startEditSeasonal = (s: SeasonalProduct) => {
+    setEditingSeasonalId(s.id);
+    setEditSeasonalForm({ ...s });
   };
 
   const saveEditProduct = () => {
     if (!editForm) return;
-    saveProductsToLocal(products.map(p => p.id === editForm.id ? editForm : p));
+    saveProductsToLocal(products.map(p => String(p.id) === String(editForm.id) ? editForm : p));
     setEditingId(null);
     setEditForm(null);
   };
@@ -1289,7 +1346,7 @@ export default function AdminDashboard() {
                   <div className="relative aspect-[4/3] bg-[#FAF5EE]">
                     <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
                     <button
-                      onClick={() => triggerImageUpload(p.id)}
+                      onClick={() => triggerImageUpload(`product_${p.id}`)}
                       className="absolute bottom-3 right-3 bg-white/95 text-brand-choco hover:bg-brand hover:text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1"
                     >
                       <Upload size={13} /> Tải ảnh mới
@@ -2960,7 +3017,7 @@ export default function AdminDashboard() {
                       </div>
                       <div className="mt-2 space-y-1">
                         <button
-                          onClick={() => triggerImageUpload(p.id)}
+                          onClick={() => triggerImageUpload(`product_${p.id}`)}
                           className="w-full py-1 bg-brand-vanilla text-brand text-[10px] font-bold rounded-lg hover:bg-brand hover:text-white transition-colors cursor-pointer"
                         >
                           Đổi ảnh đại diện
