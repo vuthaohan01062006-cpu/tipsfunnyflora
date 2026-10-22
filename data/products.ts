@@ -155,11 +155,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       "Nhân bánh: Lõi mứt việt quất chua đượm bọc ngoài bởi lớp phô mai Mascarpone béo mịn",
       "Hậu vị: Nốt béo ngậy của kem sữa hòa quyện vị thanh thoát quyến rũ của quả mọng"
     ],
-    "gallery": [
-      "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?auto=format&fit=crop&w=800&q=85"
-    ]
+    "gallery": []
   }
 ];
 
