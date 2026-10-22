@@ -40,51 +40,54 @@ export default function ProductDetailPage() {
   const { addToCart, setIsCheckoutOpen, setIsCartOpen } = useCart();
   const { language, t } = useLanguage();
 
-  // Load updated products from localStorage if admin customized them
+  // Load updated products from localStorage if admin customized them with real-time sync
   useEffect(() => {
-    let currentProducts = INITIAL_PRODUCTS;
-    let currentSeasonal = INITIAL_SEASONAL_PRODUCTS;
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          currentProducts = parsed;
+    const reloadProduct = () => {
+      let currentProducts = INITIAL_PRODUCTS;
+      let currentSeasonal = INITIAL_SEASONAL_PRODUCTS;
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            currentProducts = parsed;
+          }
         }
+      } catch {
+        // fallback
       }
-    } catch {
-      // fallback
-    }
 
-    try {
-      const savedSeasonal = localStorage.getItem(SEASONAL_STORAGE_KEY);
-      if (savedSeasonal) {
-        const parsedSeasonal = JSON.parse(savedSeasonal);
-        if (Array.isArray(parsedSeasonal) && parsedSeasonal.length > 0) {
-          currentSeasonal = parsedSeasonal;
+      try {
+        const savedSeasonal = localStorage.getItem(SEASONAL_STORAGE_KEY);
+        if (savedSeasonal) {
+          const parsedSeasonal = JSON.parse(savedSeasonal);
+          if (Array.isArray(parsedSeasonal) && parsedSeasonal.length > 0) {
+            currentSeasonal = parsedSeasonal;
+          }
         }
+      } catch {
+        // fallback
       }
-    } catch {
-      // fallback
-    }
 
-    const combined = [...currentProducts, ...currentSeasonal];
-    const found = combined.find(p => String(p.id) === productId) || combined[0];
-    if (found) {
-      setProduct(found);
-      setActiveImage(found.image || found.gallery?.[0] || "");
-    }
+      const combined = [...currentProducts, ...currentSeasonal];
+      const found = combined.find(p => String(p.id) === productId) || combined[0];
+      if (found) {
+        setProduct(found);
+        setActiveImage(found.image || found.gallery?.[0] || "");
+      }
+    };
+
+    reloadProduct();
+
+    window.addEventListener("storage", reloadProduct);
+    return () => window.removeEventListener("storage", reloadProduct);
   }, [productId]);
 
-  // Gallery thumbnails
-  const imageGallery = product.gallery && product.gallery.length > 0
-    ? product.gallery
-    : [
-        product.image || "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
-        "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?auto=format&fit=crop&w=800&q=85",
-        "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=800&q=85",
-        "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=85"
-      ];
+  // Gallery thumbnails: Always puts the latest product.image first, followed by other gallery images
+  const imageGallery = [
+    product.image,
+    ...(product.gallery || []).filter(g => Boolean(g) && g !== product.image)
+  ].filter(Boolean) as string[];
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
