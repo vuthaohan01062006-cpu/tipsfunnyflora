@@ -1,7 +1,7 @@
 export interface BlogPost {
   id: number | string;
   title: string;
-  category: "Kỹ thuật" | "Nguyên liệu" | "Cảm xúc" | "Sự kiện";
+  category: "Kỹ thuật" | "Nguyên liệu" | "Cảm xúc" | "Sự kiện" | "Quà tặng";
   date: string;
   readTime: string;
   excerpt: string;
@@ -13,6 +13,7 @@ export interface BlogPost {
 export interface CustomBoxConfig {
   title: string;
   subtitle: string;
+  image?: string;
   box6Price: string;
   box12Price: string;
   description: string;
@@ -29,6 +30,7 @@ export interface AboutCommitment {
 export interface AboutConfig {
   title: string;
   subtitle: string;
+  image?: string;
   storyP1: string;
   storyP2: string;
   commitments: AboutCommitment[];
@@ -165,4 +167,4 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
   }
 };
 
-export const SITE_CONTENT_STORAGE_KEY = "treat_sweet_site_content_v2";
+export const SITE_CONTENT_STORAGE_KEY = "treat_sweet_site_content_v3";

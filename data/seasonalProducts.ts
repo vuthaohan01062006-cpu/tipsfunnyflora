@@ -3,6 +3,7 @@ export interface SeasonalProduct {
   name: string;
   desc: string;
   price: string;
+  priceUnit?: string;
   color: string;
   textColor?: string;
   image?: string;
