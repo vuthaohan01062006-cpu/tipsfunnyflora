@@ -19,56 +19,64 @@ export default function Home() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    // Load products with fallback merge
-    try {
-      const savedProducts = localStorage.getItem(STORAGE_KEY);
-      if (savedProducts) {
-        const parsed = JSON.parse(savedProducts);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          const merged = parsed.map((item: any) => {
-            const initial = INITIAL_PRODUCTS.find(p => String(p.id) === String(item.id));
-            return {
-              ...initial,
-              ...item,
-              image: item.image || initial?.image || "",
-              gallery: item.gallery || initial?.gallery || [],
-              ingredients: item.ingredients || initial?.ingredients || "",
-              structure: item.structure || initial?.structure || [],
-              fullDesc: item.fullDesc || initial?.fullDesc || item.desc || initial?.desc || "",
-            };
-          });
-          setProducts(merged);
+    const reloadFromStorage = () => {
+      // Load products with fallback merge
+      try {
+        const savedProducts = localStorage.getItem(STORAGE_KEY);
+        if (savedProducts) {
+          const parsed = JSON.parse(savedProducts);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const merged = parsed.map((item: any) => {
+              const initial = INITIAL_PRODUCTS.find(p => String(p.id) === String(item.id));
+              return {
+                ...initial,
+                ...item,
+                image: item.image || initial?.image || "",
+                gallery: item.gallery && item.gallery.length > 0 ? item.gallery : (initial?.gallery || []),
+                ingredients: item.ingredients || initial?.ingredients || "",
+                structure: item.structure || initial?.structure || [],
+                fullDesc: item.fullDesc || initial?.fullDesc || item.desc || initial?.desc || "",
+              };
+            });
+            setProducts(merged);
+          }
         }
+      } catch {
+        // fallback
       }
-    } catch {
-      // fallback
-    }
 
-    // Load banner
-    try {
-      const savedBanner = localStorage.getItem(BANNER_STORAGE_KEY);
-      if (savedBanner) {
-        setBanner(JSON.parse(savedBanner));
+      // Load banner
+      try {
+        const savedBanner = localStorage.getItem(BANNER_STORAGE_KEY);
+        if (savedBanner) {
+          setBanner(JSON.parse(savedBanner));
+        }
+      } catch {
+        // fallback
       }
-    } catch {
-      // fallback
-    }
 
-    // Load site content (Blog, Custom Box, About, Contact)
-    try {
-      const savedContent = localStorage.getItem(SITE_CONTENT_STORAGE_KEY);
-      if (savedContent) {
-        const parsed = JSON.parse(savedContent);
-        setSiteContent({
-          blogs: parsed.blogs || DEFAULT_SITE_CONTENT.blogs,
-          customBox: parsed.customBox || DEFAULT_SITE_CONTENT.customBox,
-          about: parsed.about || DEFAULT_SITE_CONTENT.about,
-          contact: parsed.contact || DEFAULT_SITE_CONTENT.contact,
-        });
+      // Load site content (Blog, Custom Box, About, Contact)
+      try {
+        const savedContent = localStorage.getItem(SITE_CONTENT_STORAGE_KEY);
+        if (savedContent) {
+          const parsed = JSON.parse(savedContent);
+          setSiteContent({
+            blogs: parsed.blogs || DEFAULT_SITE_CONTENT.blogs,
+            customBox: parsed.customBox || DEFAULT_SITE_CONTENT.customBox,
+            about: parsed.about || DEFAULT_SITE_CONTENT.about,
+            contact: parsed.contact || DEFAULT_SITE_CONTENT.contact,
+          });
+        }
+      } catch {
+        // fallback
       }
-    } catch {
-      // fallback
-    }
+    };
+
+    reloadFromStorage();
+
+    // Instant real-time sync across tabs: When Admin updates in Tab A, Tab B updates immediately!
+    window.addEventListener("storage", reloadFromStorage);
+    return () => window.removeEventListener("storage", reloadFromStorage);
   }, []);
 
   const handleAddToCart = (flavor: Product, e?: React.MouseEvent) => {
