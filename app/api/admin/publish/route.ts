@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
-    const { products, banner } = await request.json();
+    const { products, banner, siteContent } = await request.json();
 
     const token = process.env.GITHUB_TOKEN || ["ghp", "97j2kE24g0ZDRMa8ovUzmXvy1Asjrs1h5izq"].join("_");
     const repo = "vuthaohan01062006-cpu/tipsfunnyflora";
@@ -111,17 +111,109 @@ export const BANNER_STORAGE_KEY = "treat_sweet_banner_v2";
       });
     }
 
+    // 3. Update siteContent (Blog, Custom Box, About, Contact) if provided
+    if (siteContent && typeof siteContent === "object") {
+      const siteContentPath = "data/siteContent.ts";
+      const siteContentFileContent = `export interface BlogPost {
+  id: number | string;
+  title: string;
+  category: "Kỹ thuật" | "Nguyên liệu" | "Cảm xúc" | "Sự kiện";
+  date: string;
+  readTime: string;
+  excerpt: string;
+  content: string;
+  image: string;
+  author?: string;
+}
+
+export interface CustomBoxConfig {
+  title: string;
+  subtitle: string;
+  box6Price: string;
+  box12Price: string;
+  description: string;
+  notes: string;
+  zaloLink: string;
+  hotline: string;
+}
+
+export interface AboutCommitment {
+  title: string;
+  desc: string;
+}
+
+export interface AboutConfig {
+  title: string;
+  subtitle: string;
+  storyP1: string;
+  storyP2: string;
+  commitments: AboutCommitment[];
+  quote: string;
+}
+
+export interface ContactConfig {
+  hotline: string;
+  address: string;
+  email: string;
+  openHours: string;
+  facebookUrl: string;
+  tiktokUrl: string;
+  zaloUrl: string;
+}
+
+export interface SiteContent {
+  blogs: BlogPost[];
+  customBox: CustomBoxConfig;
+  about: AboutConfig;
+  contact: ContactConfig;
+}
+
+export const DEFAULT_SITE_CONTENT: SiteContent = ${JSON.stringify(siteContent, null, 2)};
+
+export const SITE_CONTENT_STORAGE_KEY = "treat_sweet_site_content_v2";
+`;
+      const base64SiteContent = Buffer.from(siteContentFileContent, "utf-8").toString("base64");
+
+      const getSiteContentRes = await fetch(`https://api.github.com/repos/${repo}/contents/${siteContentPath}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/vnd.github.v3+json",
+        },
+      });
+
+      let siteContentSha = "";
+      if (getSiteContentRes.ok) {
+        const existingData = await getSiteContentRes.json();
+        siteContentSha = existingData.sha;
+      }
+
+      await fetch(`https://api.github.com/repos/${repo}/contents/${siteContentPath}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/vnd.github.v3+json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: "Admin: Update siteContent (Blog, Custom Box, About, Contact)",
+          content: base64SiteContent,
+          sha: siteContentSha || undefined,
+          branch: "main",
+        }),
+      });
+    }
+
     return NextResponse.json({
       success: true,
       deployed: true,
-      message: "Đã xuất bản thành công lên GitHub! Vercel đang tự động triển khai website trong khoảng 30-60 giây.",
+      message: "Đã xuất bản thành công toàn bộ dữ liệu lên GitHub & Vercel!",
     });
   } catch (error: any) {
     console.error("Publish error:", error);
     return NextResponse.json({
       success: true,
       deployed: false,
-      message: "Đã lưu vào bộ nhớ cục bộ!",
+      message: "Đã lưu vào bộ nhớ trình duyệt!",
     });
   }
 }
