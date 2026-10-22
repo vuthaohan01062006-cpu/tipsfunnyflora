@@ -2,10 +2,10 @@ export interface Product {
   id: number | string;
   name: string;
   desc: string;
-  price: string;
+  price?: string;
   color: string;
   textColor?: string;
-  image: string;
+  image?: string;
   category?: string;
   isPopular?: boolean;
 }
@@ -14,33 +14,33 @@ export const INITIAL_PRODUCTS: Product[] = [
   {
     id: 1,
     name: "Vani Madagascar",
-    desc: "Thơm béo ngọt ngào cho ngày dịu êm.",
+    desc: "thơm béo ngọt ngào cho ngày dịu êm",
     price: "35.000đ",
     color: "bg-[#FDF8E1]",
     textColor: "text-brand-choco",
-    image: "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=600&q=80",
+    image: "",
     category: "Cổ điển",
     isPopular: true
   },
   {
     id: 2,
     name: "Uji Matcha",
-    desc: "Thanh nhẹ thoảng đắng chạm nhẹ nốt bình yên.",
+    desc: "thanh nhẹ thoảng đắng chạm nhẹ nốt bình yên",
     price: "35.000đ",
     color: "bg-[#D0E3C5]",
     textColor: "text-brand-choco",
-    image: "https://images.unsplash.com/photo-1558326567-98ae2405596b?auto=format&fit=crop&w=600&q=80",
+    image: "",
     category: "Thanh mát",
     isPopular: true
   },
   {
     id: 3,
     name: "Lemonade",
-    desc: "Chua dịu tươi mát đánh thức tâm trạng.",
+    desc: "chua dịu tươi mát đánh thức tâm trạng",
     price: "35.000đ",
     color: "bg-[#FFFACD]",
     textColor: "text-brand-choco",
-    image: "https://images.unsplash.com/photo-1570476922354-81227cdbb76c?auto=format&fit=crop&w=600&q=80",
+    image: "",
     category: "Trái cây"
   },
   {
@@ -50,17 +50,17 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: "35.000đ",
     color: "bg-[#C1E1C1]",
     textColor: "text-brand-choco",
-    image: "https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&w=600&q=80",
+    image: "",
     category: "Thanh mát"
   },
   {
     id: 5,
     name: "Socola Ganache",
-    desc: "Ngọt đắng đan xen trọn vị ấm áp.",
+    desc: "ngọt đắng đan xen trọn vị ấm áp",
     price: "38.000đ",
     color: "bg-[#8B5A2B]",
     textColor: "text-white",
-    image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=600&q=80",
+    image: "",
     category: "Đặc biệt",
     isPopular: true
   },
@@ -71,20 +71,20 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: "35.000đ",
     color: "bg-[#FFD1DC]",
     textColor: "text-brand-choco",
-    image: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=600&q=80",
+    image: "",
     category: "Trái cây",
     isPopular: true
   },
   {
     id: 7,
     name: "Blueberry Mascarpone",
-    desc: "Chua thanh béo mịn ngọt ngào chạm cảm xúc.",
+    desc: "Chua thanh béo mịn ngọt ngào chạm cảm xúc",
     price: "38.000đ",
     color: "bg-[#E1D5E7]",
     textColor: "text-brand-choco",
-    image: "https://images.unsplash.com/photo-1558024920-b41e1887dc32?auto=format&fit=crop&w=600&q=80",
+    image: "",
     category: "Đặc biệt"
   }
 ];
 
-export const STORAGE_KEY = "treat_sweet_products_v2";
+export const STORAGE_KEY = "treat_sweet_products_v3";
