@@ -27,7 +27,7 @@ export async function POST(request: Request) {
 
 export const INITIAL_PRODUCTS: Product[] = ${JSON.stringify(products, null, 2)};
 
-export const STORAGE_KEY = "treat_sweet_products_v1";
+export const STORAGE_KEY = "treat_sweet_products_v2";
 `;
 
     // Encode Base64
