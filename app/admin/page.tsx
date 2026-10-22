@@ -120,6 +120,7 @@ export default function AdminDashboard() {
 
   // Hidden file input refs
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadTargetIdRef = useRef<string | number | null>(null);
   const [uploadTargetId, setUploadTargetId] = useState<string | number | null>(null);
 
   const loadAllData = () => {
@@ -223,6 +224,28 @@ export default function AdminDashboard() {
     router.push("/admin/login");
   };
 
+  const handleClearCache = () => {
+    if (confirm("Bạn có muốn dọn dẹp sạch bộ nhớ đệm trình duyệt để giải phóng dung lượng và nạp dữ liệu chuẩn mới nhất không?")) {
+      const keysToClear = [
+        STORAGE_KEY,
+        SEASONAL_STORAGE_KEY,
+        BANNER_STORAGE_KEY,
+        SITE_CONTENT_STORAGE_KEY,
+        "treat_sweet_products_v1",
+        "treat_sweet_products_v2",
+        "treat_sweet_products_v3",
+        "treat_sweet_banner_v1",
+        "treat_sweet_site_content_v1",
+        "treat_sweet_site_content_v2",
+      ];
+      keysToClear.forEach(k => {
+        try { localStorage.removeItem(k); } catch (_) {}
+      });
+      loadAllData();
+      showNotification("Đã giải phóng sạch bộ nhớ đệm trình duyệt thành công!", "success");
+    }
+  };
+
   // Safe storage helper with quota auto-recovery
   const safeSaveItem = (key: string, value: string): boolean => {
     try {
@@ -238,6 +261,7 @@ export default function AdminDashboard() {
         "treat_sweet_banner_v1",
         "treat_sweet_site_content_v1",
         "treat_sweet_site_content_v2",
+        "treat_sweet_cart_v1",
       ];
       legacyKeys.forEach(k => {
         try { localStorage.removeItem(k); } catch (_) {}
@@ -248,7 +272,13 @@ export default function AdminDashboard() {
         return true;
       } catch (retryErr) {
         console.error("Storage still full after cleanup:", retryErr);
-        return false;
+        try {
+          localStorage.removeItem("treat_sweet_cart_v1");
+          localStorage.setItem(key, value);
+          return true;
+        } catch (_) {
+          return false;
+        }
       }
     }
   };
@@ -398,8 +428,9 @@ export default function AdminDashboard() {
     });
   };
 
-  // Image Upload Trigger & Handler
+  // Image Upload Trigger & Handler (Synchronous ref-backed for 100% reliable uploads)
   const triggerImageUpload = (targetId: string | number) => {
+    uploadTargetIdRef.current = targetId;
     setUploadTargetId(targetId);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -411,9 +442,15 @@ export default function AdminDashboard() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const currentTarget = uploadTargetIdRef.current ?? uploadTargetId;
+    if (currentTarget === null || currentTarget === undefined) {
+      console.warn("Upload target missing, retrying with fallback");
+      return;
+    }
+
     showNotification("Đang tối ưu ảnh siêu nét & cập nhật ngay...", "info");
 
-    const isBannerTarget = uploadTargetId === "banner";
+    const isBannerTarget = currentTarget === "banner";
     const base64Url = await compressImageFile(file, isBannerTarget);
     if (e.target) e.target.value = "";
 
@@ -422,99 +459,95 @@ export default function AdminDashboard() {
       return;
     }
 
-    if (uploadTargetId === "banner") {
+    if (currentTarget === "banner") {
       const updated = { ...banner, imageUrl: base64Url };
       saveBannerToLocal(updated);
-      showNotification("Đã áp dụng ảnh Banner mới thành công! Website đã cập nhật ngay.", "success");
-    } else if (uploadTargetId === "new_product") {
+      showNotification("Đã áp dụng ảnh Banner mới! Hãy bấm 'Xuất bản lên Web' để lưu vĩnh viễn.", "success");
+    } else if (currentTarget === "new_product") {
       setNewProduct(prev => ({ ...prev, image: base64Url }));
       showNotification("Đã chọn ảnh sắc nét cho sản phẩm mới!", "success");
-    } else if (uploadTargetId === "new_seasonal") {
+    } else if (currentTarget === "new_seasonal") {
       setNewSeasonal(prev => ({ ...prev, image: base64Url }));
       showNotification("Đã chọn ảnh sắc nét cho bánh theo mùa mới!", "success");
-    } else if (uploadTargetId === "new_blog") {
+    } else if (currentTarget === "new_blog") {
       setNewBlog(prev => ({ ...prev, image: base64Url }));
       showNotification("Đã chọn ảnh bìa cho bài viết Blog mới!", "success");
-    } else if (uploadTargetId === "edit_product") {
+    } else if (currentTarget === "edit_product") {
       setEditForm(prev => prev ? { 
         ...prev, 
         image: base64Url,
-        gallery: [base64Url, ...(prev.gallery || []).filter(g => g !== base64Url)]
       } : null);
-      showNotification("Đã cập nhật ảnh cho vị bánh đang chỉnh sửa!", "success");
-    } else if (uploadTargetId === "add_gallery_product") {
+      showNotification("Đã cập nhật ảnh đại diện vị bánh! Bấm 'Lưu thay đổi' phía dưới.", "success");
+    } else if (currentTarget === "add_gallery_product") {
       setEditForm(prev => {
         if (!prev) return null;
         const currentGallery = prev.gallery || (prev.image ? [prev.image] : []);
         return {
           ...prev,
-          gallery: [...currentGallery, base64Url]
+          gallery: [...currentGallery, base64Url].slice(-6)
         };
       });
-      showNotification("Đã thêm 1 ảnh mới vào album ảnh bánh!", "success");
-    } else if (uploadTargetId === "add_gallery_seasonal") {
+      showNotification("Đã thêm 1 ảnh mới vào album ảnh bánh! Bấm 'Lưu thay đổi' phía dưới.", "success");
+    } else if (currentTarget === "add_gallery_seasonal") {
       setEditSeasonalForm(prev => {
         if (!prev) return null;
         const currentGallery = prev.gallery || (prev.image ? [prev.image] : []);
         return {
           ...prev,
-          gallery: [...currentGallery, base64Url]
+          gallery: [...currentGallery, base64Url].slice(-6)
         };
       });
-      showNotification("Đã thêm 1 ảnh mới vào album bánh theo mùa!", "success");
-    } else if (uploadTargetId === "edit_seasonal_image") {
+      showNotification("Đã thêm 1 ảnh mới vào album bánh theo mùa! Bấm 'Lưu thay đổi'.", "success");
+    } else if (currentTarget === "edit_seasonal_image") {
       setEditSeasonalForm(prev => prev ? {
         ...prev,
         image: base64Url,
-        gallery: [base64Url, ...(prev.gallery || []).filter(g => g !== base64Url)]
       } : null);
-      showNotification("Đã cập nhật ảnh đại diện bánh theo mùa!", "success");
-    } else if (uploadTargetId === "edit_blog") {
+      showNotification("Đã cập nhật ảnh đại diện bánh theo mùa! Bấm 'Lưu thay đổi'.", "success");
+    } else if (currentTarget === "edit_blog") {
       setEditBlogForm(prev => prev ? { ...prev, image: base64Url } : null);
-      showNotification("Đã cập nhật ảnh bìa cho bài viết đang chỉnh sửa!", "success");
-    } else if (uploadTargetId === "about_image") {
+      showNotification("Đã cập nhật ảnh bìa cho bài viết đang chỉnh sửa! Bấm 'Lưu bài viết'.", "success");
+    } else if (currentTarget === "about_image") {
       const updated = {
         ...siteContent,
         about: { ...siteContent.about, image: base64Url }
       };
       saveSiteContentToLocal(updated, "Về Chúng Mình");
-      showNotification("Đã cập nhật ảnh câu chuyện thương hiệu thành công!", "success");
-    } else if (uploadTargetId === "custombox_image") {
+      showNotification("Đã cập nhật ảnh câu chuyện thương hiệu thành công! Hãy bấm 'Xuất bản lên Web'.", "success");
+    } else if (currentTarget === "custombox_image") {
       const updated = {
         ...siteContent,
         customBox: { ...siteContent.customBox, image: base64Url }
       };
       saveSiteContentToLocal(updated, "Hộp Quà Custom Box");
-      showNotification("Đã cập nhật ảnh minh họa hộp quà Custom Box!", "success");
-    } else if (typeof uploadTargetId === "string" && uploadTargetId.startsWith("blog_")) {
-      const bId = uploadTargetId.replace("blog_", "");
+      showNotification("Đã cập nhật ảnh minh họa hộp quà Custom Box! Hãy bấm 'Xuất bản lên Web'.", "success");
+    } else if (typeof currentTarget === "string" && currentTarget.startsWith("blog_")) {
+      const bId = currentTarget.replace("blog_", "");
       const updatedBlogs = siteContent.blogs.map(b => 
         String(b.id) === bId ? { ...b, image: base64Url } : b
       );
       saveSiteContentToLocal({ ...siteContent, blogs: updatedBlogs }, "Sau Lớp Vỏ");
-      showNotification("Đã cập nhật ảnh bài viết blog thành công!", "success");
-    } else if (typeof uploadTargetId === "string" && uploadTargetId.startsWith("seasonal_")) {
-      const sId = uploadTargetId.replace("seasonal_", "");
+      showNotification("Đã cập nhật ảnh bài viết blog thành công! Hãy bấm 'Xuất bản lên Web'.", "success");
+    } else if (typeof currentTarget === "string" && currentTarget.startsWith("seasonal_")) {
+      const sId = currentTarget.replace("seasonal_", "");
       const updated = seasonalProducts.map(s => 
         String(s.id) === sId ? { 
           ...s, 
           image: base64Url,
-          gallery: [base64Url, ...(s.gallery || []).filter(g => g !== base64Url)]
         } : s
       );
       saveSeasonalToLocal(updated);
-      showNotification("Đã cập nhật ảnh bánh theo mùa thành công!", "success");
-    } else if (uploadTargetId !== null) {
-      const targetStr = String(uploadTargetId);
+      showNotification("Đã cập nhật ảnh bánh theo mùa thành công! Hãy bấm 'Xuất bản lên Web'.", "success");
+    } else {
+      const targetStr = String(currentTarget);
       const updated = products.map(p => 
         String(p.id) === targetStr ? { 
           ...p, 
           image: base64Url,
-          gallery: [base64Url, ...(p.gallery || []).filter(g => g !== base64Url)]
         } : p
       );
       saveProductsToLocal(updated);
-      showNotification("Đã cập nhật ảnh bánh thành công! Website đã hiển thị ngay.", "success");
+      showNotification("Đã cập nhật ảnh bánh thành công! Hãy bấm 'Xuất bản lên Web' để lưu vĩnh viễn.", "success");
     }
   };
 
@@ -878,6 +911,14 @@ export default function AdminDashboard() {
             >
               <Send size={14} className="mr-1.5" />
               {isPublishing ? "Đang xuất bản..." : hasUnpublishedChanges ? "🔥 Xuất bản lên Web ngay!" : "Xuất bản lên Web"}
+            </button>
+
+            <button
+              onClick={handleClearCache}
+              className="inline-flex items-center text-xs font-semibold px-3 py-2 rounded-xl text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 transition-colors cursor-pointer"
+              title="Dọn dẹp sạch bộ nhớ đệm trình duyệt nếu gặp lỗi đầy bộ nhớ"
+            >
+              <RefreshCw size={13} className="mr-1.5 text-amber-600" /> Dọn Cache
             </button>
 
             <button

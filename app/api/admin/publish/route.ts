@@ -237,7 +237,7 @@ export const SITE_CONTENT_STORAGE_KEY = "treat_sweet_site_content_v3";
       headers,
       body: JSON.stringify({
         sha: newCommitSha,
-        force: false,
+        force: true,
       }),
     });
     if (!updateRes.ok) {
