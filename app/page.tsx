@@ -91,7 +91,13 @@ export default function Home() {
 
     // Instant real-time sync across tabs: When Admin updates in Tab A, Tab B updates immediately!
     window.addEventListener("storage", reloadFromStorage);
-    return () => window.removeEventListener("storage", reloadFromStorage);
+    window.addEventListener("focus", reloadFromStorage);
+    document.addEventListener("visibilitychange", reloadFromStorage);
+    return () => {
+      window.removeEventListener("storage", reloadFromStorage);
+      window.removeEventListener("focus", reloadFromStorage);
+      document.removeEventListener("visibilitychange", reloadFromStorage);
+    };
   }, []);
 
   const handleAddToCart = (flavor: Product, e?: React.MouseEvent) => {

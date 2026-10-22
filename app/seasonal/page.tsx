@@ -60,7 +60,13 @@ export default function SeasonalPage() {
     reloadSeasonal();
 
     window.addEventListener("storage", reloadSeasonal);
-    return () => window.removeEventListener("storage", reloadSeasonal);
+    window.addEventListener("focus", reloadSeasonal);
+    document.addEventListener("visibilitychange", reloadSeasonal);
+    return () => {
+      window.removeEventListener("storage", reloadSeasonal);
+      window.removeEventListener("focus", reloadSeasonal);
+      document.removeEventListener("visibilitychange", reloadSeasonal);
+    };
   }, []);
 
   // Filter seasons

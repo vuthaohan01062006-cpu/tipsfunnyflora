@@ -325,52 +325,72 @@ export default function AdminDashboard() {
         return;
       }
 
+      let isResolved = false;
+      const safeResolve = (val: string) => {
+        if (isResolved) return;
+        isResolved = true;
+        try { URL.revokeObjectURL(objectUrl); } catch (_) {}
+        resolve(val);
+      };
+
+      // 4-second timeout fallback to ensure upload never hangs
+      const timer = setTimeout(() => {
+        const reader = new FileReader();
+        reader.onload = (re) => safeResolve((re.target?.result as string) || "");
+        reader.onerror = () => safeResolve("");
+        reader.readAsDataURL(file);
+      }, 4000);
+
       const img = new Image();
       img.onload = () => {
-        URL.revokeObjectURL(objectUrl);
+        clearTimeout(timer);
+        try {
+          // Optimal dimensions: 640px is crisp Retina for cards & modals, banner 1200px
+          const maxWidth = isBanner ? 1200 : 640;
+          const maxHeight = isBanner ? 600 : 640;
+          let width = img.width || 640;
+          let height = img.height || 640;
 
-        // Optimal dimensions: 640px is crisp Retina for cards & modals, banner 1200px
-        const maxWidth = isBanner ? 1200 : 640;
-        const maxHeight = isBanner ? 600 : 640;
-        let width = img.width;
-        let height = img.height;
-
-        if (width > maxWidth || height > maxHeight) {
-          if (width / maxWidth > height / maxHeight) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-          } else {
-            width = Math.round((width * maxHeight) / height);
-            height = maxHeight;
+          if (width > maxWidth || height > maxHeight) {
+            if (width / maxWidth > height / maxHeight) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            } else {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
           }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            safeResolve("");
+            return;
+          }
+
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const quality = isBanner ? 0.75 : 0.72;
+          const compressed = canvas.toDataURL("image/jpeg", quality);
+          safeResolve(compressed);
+        } catch (err) {
+          console.warn("Canvas compression fallback:", err);
+          const reader = new FileReader();
+          reader.onload = (re) => safeResolve((re.target?.result as string) || "");
+          reader.onerror = () => safeResolve("");
+          reader.readAsDataURL(file);
         }
-
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          resolve("");
-          return;
-        }
-
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = "high";
-        ctx.drawImage(img, 0, 0, width, height);
-
-        // Quality 0.72 - 0.75 yields crystal-sharp macaron images at only ~25KB - 35KB!
-        // This prevents LocalStorage 5MB quota overflow and ensures 100% reliable saves.
-        const quality = isBanner ? 0.75 : 0.72;
-        const compressed = canvas.toDataURL("image/jpeg", quality);
-        resolve(compressed);
       };
 
       img.onerror = () => {
-        URL.revokeObjectURL(objectUrl);
-        // Fallback to FileReader if object URL fails
+        clearTimeout(timer);
         const reader = new FileReader();
-        reader.onload = (readerEvent) => resolve((readerEvent.target?.result as string) || "");
-        reader.onerror = () => resolve("");
+        reader.onload = (re) => safeResolve((re.target?.result as string) || "");
+        reader.onerror = () => safeResolve("");
         reader.readAsDataURL(file);
       };
 
@@ -761,14 +781,14 @@ export default function AdminDashboard() {
       });
 
       const data = await res.json();
-      if (data.success) {
+      if (data.success && data.deployed) {
         setHasUnpublishedChanges(false);
-        showNotification(data.message || "Xuất bản thành công lên Website!", "success");
+        showNotification(data.message || "Xuất bản thành công lên Website! Khách hàng sẽ thấy sau 30-45s.", "success");
       } else {
-        showNotification("Dữ liệu đã được lưu trên máy của bạn thành công.", "info");
+        showNotification(data.message || "Không thể xuất bản lên GitHub! Dữ liệu đã được lưu an toàn trên máy bạn.", "error");
       }
-    } catch {
-      showNotification("Đã lưu trên máy của bạn thành công!", "info");
+    } catch (err: any) {
+      showNotification(`Lỗi kết nối xuất bản: ${err?.message || "Vui lòng thử lại sau"}. Dữ liệu đã lưu an toàn trên máy bạn.`, "error");
     } finally {
       setIsPublishing(false);
     }
