@@ -2,30 +2,62 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Coffee, Heart, Gift, BookOpen, Send, ShoppingCart, Check, ArrowRight } from "lucide-react";
+import { Coffee, Heart, Gift, BookOpen, Send, ShoppingCart, Check, ArrowRight, Eye } from "lucide-react";
 import { INITIAL_PRODUCTS, Product, STORAGE_KEY } from "@/data/products";
+import { DEFAULT_BANNER, BannerConfig, BANNER_STORAGE_KEY } from "@/data/banner";
 import { useCart } from "@/context/CartContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
+  const [banner, setBanner] = useState<BannerConfig>(DEFAULT_BANNER);
+
   const { addToCart, setIsCartOpen } = useCart();
+  const { language, t } = useLanguage();
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    // Load products with fallback merge
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
+      const savedProducts = localStorage.getItem(STORAGE_KEY);
+      if (savedProducts) {
+        const parsed = JSON.parse(savedProducts);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setProducts(parsed);
+          const merged = parsed.map((item: any) => {
+            const initial = INITIAL_PRODUCTS.find(p => String(p.id) === String(item.id));
+            return {
+              ...initial,
+              ...item,
+              image: item.image || initial?.image || "",
+              gallery: item.gallery || initial?.gallery || [],
+              ingredients: item.ingredients || initial?.ingredients || "",
+              structure: item.structure || initial?.structure || [],
+              fullDesc: item.fullDesc || initial?.fullDesc || item.desc || initial?.desc || "",
+            };
+          });
+          setProducts(merged);
         }
+      }
+    } catch {
+      // fallback
+    }
+
+    // Load banner
+    try {
+      const savedBanner = localStorage.getItem(BANNER_STORAGE_KEY);
+      if (savedBanner) {
+        setBanner(JSON.parse(savedBanner));
       }
     } catch {
       // fallback
     }
   }, []);
 
-  const handleAddToCart = (flavor: Product) => {
+  const handleAddToCart = (flavor: Product, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     addToCart(flavor, 1);
     setToastMessage(`Đã thêm "${flavor.name}" vào giỏ hàng!`);
     setTimeout(() => {
@@ -49,7 +81,7 @@ export default function Home() {
             }}
             className="ml-2 text-xs font-bold text-brand hover:underline flex items-center gap-1 bg-white/10 px-3 py-1.5 rounded-xl hover:bg-white/20 transition-colors"
           >
-            Xem giỏ hàng <ArrowRight size={13} />
+            {t("flavors.viewCartNow")} <ArrowRight size={13} />
           </button>
         </div>
       )}
@@ -58,23 +90,36 @@ export default function Home() {
       <section className="pt-8 pb-16 px-4 bg-[#FFFCF9]">
         <div className="container mx-auto max-w-6xl">
           {/* Macaron Banner Image */}
-          <div className="w-full mb-16 rounded-[2rem] overflow-hidden shadow-sm">
-            <img src="/hero-macaron.png" alt="Treat Sweet Macaron Banner" className="w-full h-auto object-cover" />
+          <div className="w-full mb-16 rounded-[2rem] overflow-hidden shadow-sm bg-brand-vanilla/30">
+            <img 
+              src={banner.imageUrl || "/hero-macaron.png"} 
+              alt="Treat Sweet Macaron Banner" 
+              className="w-full h-auto object-cover max-h-[500px]" 
+            />
           </div>
           
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-5xl md:text-6xl font-bold text-brand-choco mb-6 leading-tight font-serif">
-              Small Treat, <span className="text-brand text-6xl">Sweet Day</span>
+              {banner.title || t("hero.title")}{" "}
+              <span className="text-brand text-6xl">
+                {banner.highlightText || t("hero.highlight")}
+              </span>
             </h1>
-            <p className="text-lg text-brand-choco/80 mb-10 max-w-2xl mx-auto">
-              Phần thưởng ngọt ngào xoa dịu những nhọc nhằn, gói ghém hương vị thủ công chuẩn Pháp trên tay bạn.
+            <p className="text-lg text-brand-choco/80 mb-10 max-w-2xl mx-auto leading-relaxed">
+              {banner.subtitle || t("hero.subtitle")}
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link href="#flavors" className="bg-brand text-white px-8 py-3 rounded-full font-medium hover:bg-brand-dark transition-colors shadow-sm">
-                Khám phá 7 nốt hương vị
+              <Link 
+                href={banner.buttonLink1 || "#flavors"} 
+                className="bg-brand text-white px-8 py-3.5 rounded-full font-bold hover:bg-brand-dark transition-all shadow-sm hover:shadow-md cursor-pointer"
+              >
+                {banner.buttonText1 || t("hero.btnFlavors")}
               </Link>
-              <Link href="#custom" className="bg-white text-brand-choco border border-brand-choco/20 px-8 py-3 rounded-full font-medium hover:bg-brand-choco hover:text-white transition-colors">
-                Đặt hộp quà custom
+              <Link 
+                href={banner.buttonLink2 || "#custom"} 
+                className="bg-white text-brand-choco border border-brand-choco/20 px-8 py-3.5 rounded-full font-bold hover:bg-brand-choco hover:text-white transition-all cursor-pointer"
+              >
+                {banner.buttonText2 || t("hero.btnCustom")}
               </Link>
             </div>
           </div>
@@ -85,8 +130,12 @@ export default function Home() {
       <section id="flavors" className="py-20 px-4 bg-white">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-brand-choco mb-4 font-serif">Bộ Sưu Tập Hương Vị</h2>
-            <p className="text-brand-choco/60 max-w-xl mx-auto">Mỗi vị bánh là một lời nhắn nhủ, một cảm xúc được nâng niu. Hãy chọn cho mình một nốt hương đồng điệu.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-brand-choco mb-4 font-serif">
+              {t("flavors.sectionTitle")}
+            </h2>
+            <p className="text-brand-choco/70 max-w-xl mx-auto">
+              {t("flavors.sectionSubtitle")}
+            </p>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -99,46 +148,68 @@ export default function Home() {
                   className={`${flavor.color} rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group relative flex flex-col justify-between`}
                 >
                   {hasImage ? (
-                    /* Khi có ảnh Canva: Hiển thị 100% sắc nét, chuẩn tỉ lệ, không bị mờ đục hay đè chữ */
+                    /* Khi có ảnh: Bấm vào ảnh chuyển thẳng đến trang Chi Tiết Sản Phẩm chuẩn theo ảnh mẫu */
                     <div className="relative w-full aspect-[4/5] overflow-hidden bg-white">
-                      <img 
-                        src={flavor.image} 
-                        alt={flavor.name} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                      />
+                      <Link 
+                        href={`/products/${flavor.id}`}
+                        className="block w-full h-full cursor-pointer"
+                      >
+                        <img 
+                          src={flavor.image} 
+                          alt={flavor.name} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                        />
+                      </Link>
+
+                      {/* Nút Xem chi tiết nhanh khi hover */}
+                      <Link
+                        href={`/products/${flavor.id}`}
+                        className="absolute top-4 left-4 bg-white/95 backdrop-blur-xs text-brand-choco text-xs font-bold px-3 py-1.5 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 hover:text-brand"
+                      >
+                        <Eye size={13} /> {t("flavors.viewDetail")}
+                      </Link>
+
                       {/* Nút giỏ hàng nổi góc dưới */}
                       <button 
-                        className="absolute bottom-4 right-4 w-11 h-11 rounded-full bg-white/95 backdrop-blur-md text-brand-choco hover:bg-brand hover:text-white flex items-center justify-center transition-all shadow-lg group-hover:scale-110 active:scale-95"
+                        className="absolute bottom-4 right-4 w-11 h-11 rounded-full bg-white/95 backdrop-blur-md text-brand-choco hover:bg-brand hover:text-white flex items-center justify-center transition-all shadow-lg group-hover:scale-110 active:scale-95 cursor-pointer z-10"
                         title="Thêm vào giỏ hàng"
-                        onClick={() => handleAddToCart(flavor)}
+                        onClick={(e) => handleAddToCart(flavor, e)}
                       >
                         <ShoppingCart size={18} />
                       </button>
                     </div>
                   ) : (
-                    /* Khi chưa tải ảnh: Thẻ màu pastel thanh lịch */
+                    /* Khi chưa có ảnh: Thẻ màu pastel */
                     <div className="p-8 flex flex-col justify-between h-64">
-                      <div>
-                        <h3 className={`text-xl font-bold ${flavor.textColor || 'text-brand-choco'} mb-3`}>
+                      <Link href={`/products/${flavor.id}`} className="group-hover:opacity-90 transition-opacity cursor-pointer">
+                        <h3 className={`text-xl font-bold ${flavor.textColor || 'text-brand-choco'} mb-3 font-serif`}>
                           {flavor.name}
                         </h3>
-                        <p className={`${flavor.textColor ? 'text-white/80' : 'text-brand-choco/70'} text-sm leading-relaxed`}>
+                        <p className={`${flavor.textColor ? 'text-white/80' : 'text-brand-choco/70'} text-sm leading-relaxed line-clamp-3`}>
                           {flavor.desc}
                         </p>
-                      </div>
+                      </Link>
                       <div className="flex justify-between items-end">
-                        <span className="text-xs font-bold text-brand-choco/60">
+                        <span className="text-sm font-bold text-brand-choco">
                           {flavor.price || "35.000đ"}
                         </span>
-                        <button 
-                          className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            flavor.textColor ? 'bg-white/20 text-white' : 'bg-white/50 text-brand-choco'
-                          } group-hover:scale-110 transition-transform active:scale-95 shadow-sm`}
-                          title="Thêm vào giỏ hàng"
-                          onClick={() => handleAddToCart(flavor)}
-                        >
-                          <ShoppingCart size={18} />
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href={`/products/${flavor.id}`}
+                            className="text-xs font-semibold underline text-brand-choco/70 hover:text-brand cursor-pointer"
+                          >
+                            {t("flavors.viewDetail")}
+                          </Link>
+                          <button 
+                            className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                              flavor.textColor ? 'bg-white/20 text-white' : 'bg-white/50 text-brand-choco'
+                            } group-hover:scale-110 transition-transform active:scale-95 shadow-sm cursor-pointer z-10`}
+                            title="Thêm vào giỏ hàng"
+                            onClick={(e) => handleAddToCart(flavor, e)}
+                          >
+                            <ShoppingCart size={18} />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -158,91 +229,57 @@ export default function Home() {
               <p className="text-brand-choco/60">Những câu chuyện mộc mạc phía sau kỹ thuật làm bánh thủ công chuẩn Pháp.</p>
             </div>
             <Link href="/blog" className="text-brand font-medium hover:underline mt-4 md:mt-0 flex items-center">
-              Xem tất cả bài viết <BookOpen size={16} className="ml-2"/>
+              Xem tất cả bài viết &rarr;
             </Link>
           </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-white p-8 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+              <span className="text-xs font-bold text-brand uppercase tracking-wider">Kỹ thuật & Cảm xúc</span>
+              <h3 className="text-xl font-bold text-brand-choco mt-2 mb-3 font-serif">Bí mật của chiếc viền chân ren (Pied) hoàn hảo</h3>
+              <p className="text-brand-choco/70 text-sm leading-relaxed mb-6">
+                Chân ren không chỉ là dấu hiệu của một chiếc macaron đạt chuẩn kỹ thuật, mà còn là kết tinh của sự kiên nhẫn khi hong khô vỏ bánh dưới nhiệt độ và độ ẩm khắt khe.
+              </p>
+              <Link href="/blog" className="text-sm font-semibold text-brand-choco hover:text-brand">Đọc tiếp &rarr;</Link>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <article className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow p-6">
-              <span className="text-brand text-xs font-bold tracking-wider mb-2 block uppercase">Sự thật / Kỹ thuật</span>
-              <h3 className="text-lg font-bold text-brand-choco mb-3">Vì sao macaron có giá thành tương đương một ly cà phê đặc sản?</h3>
-              <p className="text-sm text-gray-500 mb-4 line-clamp-3">Cùng giải mã việc sử dụng 100% bột hạnh nhân nguyên chất thay vì pha trộn, và kỹ thuật tạo chân bánh (pied) đỏng đảnh của nghệ nhân...</p>
-              <Link href="#" className="text-brand-choco text-sm font-medium hover:text-brand">Đọc tiếp &rarr;</Link>
-            </article>
-            <article className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow p-6">
-              <span className="text-brand text-xs font-bold tracking-wider mb-2 block uppercase">Hương vị</span>
-              <h3 className="text-lg font-bold text-brand-choco mb-3">Phá bỏ hiểu lầm bánh ngọt gắt: Bí quyết cân bằng vị với ganache</h3>
-              <p className="text-sm text-gray-500 mb-4 line-clamp-3">Macaron không hề gắt nếu phần nhân được làm từ ganache mộc bản thay vì kem bơ béo ngậy. Sự cân bằng độ chua - đắng - ngọt...</p>
-              <Link href="#" className="text-brand-choco text-sm font-medium hover:text-brand">Đọc tiếp &rarr;</Link>
-            </article>
-            <article className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow p-6">
-              <span className="text-brand text-xs font-bold tracking-wider mb-2 block uppercase">Trải nghiệm</span>
-              <h3 className="text-lg font-bold text-brand-choco mb-3">Quy tắc 10 phút vàng: Cách bảo quản và thưởng thức macaron trọn vị</h3>
-              <p className="text-sm text-gray-500 mb-4 line-clamp-3">Để vỏ bánh giòn tan và nhân lạnh tan chảy hoàn hảo trên đầu lưỡi, hãy để bánh nghỉ 10 phút sau khi lấy khỏi tủ lạnh...</p>
-              <Link href="#" className="text-brand-choco text-sm font-medium hover:text-brand">Đọc tiếp &rarr;</Link>
-            </article>
+            <div className="bg-white p-8 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+              <span className="text-xs font-bold text-brand uppercase tracking-wider">Nguyên liệu</span>
+              <h3 className="text-xl font-bold text-brand-choco mt-2 mb-3 font-serif">Hành trình tìm kiếm quả Vani Bourbon Madagascar</h3>
+              <p className="text-brand-choco/70 text-sm leading-relaxed mb-6">
+                Tại sao chúng mình từ chối hương liệu vani nhân tạo để theo đuổi những quả vani đen bóng được thụ phấn thủ công từ bờ bên kia Ấn Độ Dương?
+              </p>
+              <Link href="/blog" className="text-sm font-semibold text-brand-choco hover:text-brand">Đọc tiếp &rarr;</Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Custom & Gift Box (Campaign Together) */}
-      <section id="custom" className="py-20 px-4 bg-brand-choco text-brand-vanilla">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-4xl font-bold mb-6 font-serif">Custom & Gift Box</h2>
-              <p className="text-white/80 mb-8 leading-relaxed">
-                Biến những chiếc bánh thành món quà thay lời muốn nói. Chúng tôi cung cấp dịch vụ vẽ hình hoạt hình, ghi thông điệp lên vỏ bánh, hoặc thiết kế set quà tặng thiết kế riêng cho những dịp đặc biệt.
-              </p>
-              
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-start">
-                  <Heart className="text-brand shrink-0 mr-3 mt-1" size={20} />
-                  <span><strong>Hộp quà tỏ tình "Be Your Mind":</strong> Thiết kế mix màu theo tone lãng mạn.</span>
-                </li>
-                <li className="flex items-start">
-                  <Gift className="text-brand shrink-0 mr-3 mt-1" size={20} />
-                  <span><strong>Macaron vẽ hình:</strong> Vẽ nhân vật hoạt hình hoặc chibi bằng tay.</span>
-                </li>
-                <li className="flex items-start">
-                  <Coffee className="text-brand shrink-0 mr-3 mt-1" size={20} />
-                  <span><strong>Combo Tea & Macaron:</strong> Gói ghém cùng trà Anh cao cấp cho cuối tuần thư giãn.</span>
-                </li>
-              </ul>
-            </div>
-            
-            {/* Form */}
-            <div className="bg-white p-8 rounded-3xl shadow-xl text-brand-choco">
-              <h3 className="text-2xl font-bold mb-6 text-center">Gửi Yêu Cầu Đặt Quà</h3>
-              <form className="space-y-4" onSubmit={e => { e.preventDefault(); alert("Cảm ơn bạn! Tiệm sẽ liên hệ tư vấn trong ít phút."); }}>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Tên của bạn</label>
-                    <input type="text" className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Số điện thoại</label>
-                    <input type="text" className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Chọn gói quà</label>
-                  <select className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand">
-                    <option>Hộp quà tỏ tình "Be Your Mind"</option>
-                    <option>Hộp 6 bánh Macaron vẽ hình custom</option>
-                    <option>Combo Tea & Macaron cao cấp</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Lời nhắn đính kèm thiệp</label>
-                  <textarea rows={3} className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand resize-none" placeholder="Những lời yêu thương..."></textarea>
-                </div>
-                <button type="submit" className="w-full bg-brand text-white font-bold py-3 rounded-xl hover:bg-brand-dark transition-colors flex justify-center items-center">
-                  Gửi yêu cầu tư vấn <Send size={18} className="ml-2" />
-                </button>
-                <p className="text-xs text-center text-gray-500 mt-2">Hoặc inbox trực tiếp qua Fanpage để được hỗ trợ nhanh nhất.</p>
-              </form>
-            </div>
+      {/* Custom Gift Box */}
+      <section id="custom" className="py-20 px-4 bg-[#FFFCF9]">
+        <div className="container mx-auto max-w-4xl text-center">
+          <div className="inline-block p-4 rounded-full bg-brand-vanilla mb-6">
+            <Gift className="text-brand" size={32} />
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-brand-choco mb-6 font-serif">Tự Tay Mix Hộp Quà Theo Cảm Xúc</h2>
+          <p className="text-brand-choco/80 text-lg mb-8 max-w-2xl mx-auto">
+            Dành tặng bản thân hoặc người thương một hộp macaron mang thông điệp riêng. Chọn 6 hoặc 12 nốt hương bạn yêu thích kèm thiệp viết tay nắn nót.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <button 
+              onClick={() => setIsCartOpen(true)}
+              className="bg-brand text-white px-8 py-3.5 rounded-full font-bold hover:bg-brand-dark transition-colors shadow-sm cursor-pointer"
+            >
+              Mở giỏ hàng & Mix vị bánh
+            </button>
+            <a 
+              href="https://zalo.me/0909123456" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="bg-white text-brand-choco border border-brand-choco/20 px-8 py-3.5 rounded-full font-bold hover:bg-brand-choco hover:text-white transition-colors"
+            >
+              Nhắn tin đặt hộp thiết kế riêng
+            </a>
           </div>
         </div>
       </section>
