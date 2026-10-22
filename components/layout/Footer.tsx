@@ -38,6 +38,7 @@ export default function Footer() {
           <h4 className="font-semibold mb-4 text-brand-vanilla">Khám Phá</h4>
           <ul className="text-gray-300 text-sm space-y-2.5">
             <li><Link href="/#flavors" className="hover:text-brand-vanilla transition-colors">Bộ Sưu Tập 7 Vị</Link></li>
+            <li><Link href="/seasonal" className="hover:text-brand-vanilla transition-colors text-amber-200 font-medium">✨ BST Theo Mùa (Seasonal)</Link></li>
             <li><Link href="/blog" className="hover:text-brand-vanilla transition-colors">Sau Lớp Vỏ (Blog)</Link></li>
             <li><Link href="/#custom" className="hover:text-brand-vanilla transition-colors">Custom Box (Hộp Quà)</Link></li>
             <li><Link href="/about" className="hover:text-brand-vanilla transition-colors">Về Chúng Mình</Link></li>
