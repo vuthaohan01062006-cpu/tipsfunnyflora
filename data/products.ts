@@ -35,12 +35,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       "Lớp kem lót: Ganache sô cô la trắng hòa quyện tinh chất vani Bourbon nguyên chất",
       "Hậu vị: Thoảng nốt bơ sữa thơm ngậy và vị ngọt thanh tao đọng lại dài lâu"
     ],
-    "gallery": [
-      "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=85"
-    ]
+    "gallery": []
   },
   {
     "id": 2,
