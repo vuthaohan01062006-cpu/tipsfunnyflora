@@ -2,10 +2,66 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
-    const { products, banner, siteContent } = await request.json();
+    const { products, banner, siteContent, seasonalProducts } = await request.json();
 
     const token = process.env.GITHUB_TOKEN || ["ghp", "97j2kE24g0ZDRMa8ovUzmXvy1Asjrs1h5izq"].join("_");
     const repo = "vuthaohan01062006-cpu/tipsfunnyflora";
+
+    // 0. Update seasonal products if provided
+    if (Array.isArray(seasonalProducts) && seasonalProducts.length > 0) {
+      const seasonalPath = "data/seasonalProducts.ts";
+      const seasonalContent = `export interface SeasonalProduct {
+  id: number | string;
+  name: string;
+  desc: string;
+  price: string;
+  color: string;
+  textColor?: string;
+  image?: string;
+  category?: string;
+  seasonTag: string;
+  isPopular?: boolean;
+  isNew?: boolean;
+  ingredients?: string;
+  fullDesc?: string;
+  structure?: string[];
+  gallery?: string[];
+}
+
+export const INITIAL_SEASONAL_PRODUCTS: SeasonalProduct[] = ${JSON.stringify(seasonalProducts, null, 2)};
+
+export const SEASONAL_STORAGE_KEY = "treat_sweet_seasonal_v1";
+`;
+      const base64Seasonal = Buffer.from(seasonalContent, "utf-8").toString("base64");
+
+      const getSeasonalRes = await fetch(`https://api.github.com/repos/${repo}/contents/${seasonalPath}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/vnd.github.v3+json",
+        },
+      });
+
+      let seasonalSha = "";
+      if (getSeasonalRes.ok) {
+        const existingData = await getSeasonalRes.json();
+        seasonalSha = existingData.sha;
+      }
+
+      await fetch(`https://api.github.com/repos/${repo}/contents/${seasonalPath}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/vnd.github.v3+json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: "Admin: Update seasonal products & images",
+          content: base64Seasonal,
+          sha: seasonalSha || undefined,
+          branch: "main",
+        }),
+      });
+    }
 
     // 1. Update products if provided
     if (Array.isArray(products) && products.length > 0) {
