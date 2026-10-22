@@ -36,38 +36,41 @@ export default function SeasonalProductDetailPage() {
   const { addToCart, setIsCheckoutOpen, setIsCartOpen } = useCart();
   const { language, t } = useLanguage();
 
-  // Load from localStorage if admin customized
+  // Load from localStorage if admin customized with instant real-time tab sync
   useEffect(() => {
-    let currentList = INITIAL_SEASONAL_PRODUCTS;
-    try {
-      const saved = localStorage.getItem(SEASONAL_STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          currentList = parsed;
+    const reloadSeasonal = () => {
+      let currentList = INITIAL_SEASONAL_PRODUCTS;
+      try {
+        const saved = localStorage.getItem(SEASONAL_STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            currentList = parsed;
+          }
         }
+      } catch {
+        // fallback
       }
-    } catch {
-      // fallback
-    }
 
-    setAllProducts(currentList);
-    const found = currentList.find(p => String(p.id) === productId) || currentList[0];
-    if (found) {
-      setProduct(found);
-      setActiveImage(found.image || found.gallery?.[0] || "");
-    }
+      setAllProducts(currentList);
+      const found = currentList.find(p => String(p.id) === productId) || currentList[0];
+      if (found) {
+        setProduct(found);
+        setActiveImage(found.image || found.gallery?.[0] || "");
+      }
+    };
+
+    reloadSeasonal();
+
+    window.addEventListener("storage", reloadSeasonal);
+    return () => window.removeEventListener("storage", reloadSeasonal);
   }, [productId]);
 
-  // Gallery thumbnails
-  const imageGallery = product.gallery && product.gallery.length > 0
-    ? product.gallery
-    : [
-        product.image || "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=85",
-        "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
-        "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?auto=format&fit=crop&w=800&q=85",
-        "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=800&q=85"
-      ];
+  // Gallery thumbnails: Always puts product.image first, followed by remaining gallery images
+  const imageGallery = [
+    product.image,
+    ...(product.gallery || []).filter(g => Boolean(g) && g !== product.image)
+  ].filter(Boolean) as string[];
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
