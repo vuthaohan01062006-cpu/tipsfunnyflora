@@ -136,8 +136,8 @@ export default function ProductDetailPage() {
         </div>
       )}
 
-      {/* Top Breadcrumb Bar - Exactly as in the reference image (soft warm peach tint) */}
-      <div className="bg-[#FCEAD2] border-b border-[#F7D8B5] py-3 px-6 md:px-12 mb-8 md:mb-12">
+      {/* Top Breadcrumb Bar - Soft Brand Ivory Tint #FFFFF0 with Pastel Butter Accent #fafc97 */}
+      <div className="bg-[#FFFFF0] border-b border-[#fafc97] py-3.5 px-6 md:px-12 mb-8 md:mb-12 shadow-2xs">
         <div className="container mx-auto max-w-6xl flex items-center gap-2 text-xs md:text-sm text-brand-choco/80 font-medium">
           <Link href="/" className="hover:text-brand transition-colors">
             {t("detail.breadcrumbHome")}
@@ -271,8 +271,8 @@ export default function ProductDetailPage() {
             {/* Subtle Divider Line */}
             <div className="border-t border-gray-200/80 my-4" />
 
-            {/* PURCHASE ACTION BOX (STITCH-FOR-STITCH MATCH TO USER'S REFERENCE IMAGE) */}
-            <div className="bg-[#FFCD74] border border-[#F5B951] p-4 md:p-5 rounded-2xl shadow-sm mb-6 space-y-3.5">
+            {/* PURCHASE ACTION BOX WITH BRAND PASTEL PALETTE */}
+            <div className="bg-[#FFFFF0] border-2 border-[#fafc97] p-4 md:p-5 rounded-2xl shadow-sm mb-6 space-y-3.5">
               
               {/* Row 1: Quantity selector + Add To Cart Button */}
               <div className="flex items-center gap-3">
@@ -280,53 +280,53 @@ export default function ProductDetailPage() {
                 <div className="flex items-center bg-white rounded-xl border border-gray-200 overflow-hidden shadow-xs h-12 shrink-0">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-brand-choco hover:bg-gray-50 font-bold text-lg transition-colors cursor-pointer"
+                    className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-[#404d9b] hover:bg-[#fafc97]/30 font-bold text-lg transition-colors cursor-pointer"
                     title="Giảm 1"
                   >
                     -
                   </button>
-                  <span className="w-12 text-center font-bold text-brand-choco text-base bg-[#FDE5B9] h-full flex items-center justify-center select-none">
+                  <span className="w-12 text-center font-bold text-[#404d9b] text-base bg-[#fafc97]/50 h-full flex items-center justify-center select-none">
                     {quantity}
                   </span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-brand-choco hover:bg-gray-50 font-bold text-lg transition-colors cursor-pointer"
+                    className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-[#404d9b] hover:bg-[#fafc97]/30 font-bold text-lg transition-colors cursor-pointer"
                     title="Tăng 1"
                   >
                     +
                   </button>
                 </div>
 
-                {/* Add to Cart Button (Solid Dark Navy) */}
+                {/* Add to Cart Button (Brand Navy #404d9b) */}
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 h-12 bg-[#08172E] hover:bg-[#040C1A] text-white rounded-xl font-bold text-sm md:text-base flex items-center justify-center gap-2.5 shadow-md hover:shadow-lg transition-all cursor-pointer"
+                  className="flex-1 h-12 bg-[#404d9b] hover:bg-[#323d80] text-white rounded-xl font-bold text-sm md:text-base flex items-center justify-center gap-2.5 shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-98"
                 >
                   <span>{t("detail.addToCartBtn")}</span>
                   <ShoppingBag size={18} />
                 </button>
               </div>
 
-              {/* Row 2: Buy Now + Consult Zalo Button */}
+              {/* Row 2: Buy Now (Brand Pink #f17daa) + Consult Zalo (Brand Teal #23bbb7) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Buy Now Button (Terracotta Red) */}
+                {/* Buy Now Button (Pastel Pink #f17daa) */}
                 <button
                   onClick={handleBuyNow}
-                  className="h-12 bg-[#BA3826] hover:bg-[#9B2E1E] text-white rounded-xl font-bold text-sm md:text-base flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
+                  className="h-12 bg-[#f17daa] hover:bg-[#e06896] text-white rounded-xl font-bold text-sm md:text-base flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-98"
                 >
                   <span>{t("detail.buyNowBtn")}</span>
                   <span className="text-base font-bold">→</span>
                 </button>
 
-                {/* Consult via Zalo (Light Yellow with Zalo logo) */}
+                {/* Consult via Zalo (Pastel Teal #23bbb7) */}
                 <a
                   href="https://zalo.me/0909123456"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="h-12 bg-[#FFD777] hover:bg-[#FFCE57] text-[#2C1810] rounded-xl font-bold text-sm flex items-center justify-center gap-2 border border-[#E0A838] transition-all shadow-xs"
+                  className="h-12 bg-[#23bbb7] hover:bg-[#1da29e] text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg cursor-pointer"
                 >
                   <span>{t("detail.contactZalo")}</span>
-                  <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-[10px] flex items-center justify-center font-bold tracking-tight">
+                  <span className="w-5 h-5 rounded-full bg-white text-[#23bbb7] text-[10px] flex items-center justify-center font-black tracking-tight shadow-xs">
                     Zalo
                   </span>
                 </a>
