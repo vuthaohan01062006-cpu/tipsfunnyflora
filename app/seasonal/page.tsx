@@ -97,7 +97,7 @@ export default function SeasonalPage() {
       )}
 
       {/* Top Breadcrumb Bar */}
-      <div className="bg-[#FCEAD2] border-b border-orange-200/50 py-3.5 px-4">
+      <div className="bg-[#FFFFF0] border-b border-[#fafc97] py-3.5 px-4 shadow-2xs">
         <div className="container mx-auto flex items-center text-xs text-gray-700 space-x-2">
           <Link href="/" className="hover:text-brand font-medium transition-colors">
             {t("detail.breadcrumbHome") || "Trang chủ"}
