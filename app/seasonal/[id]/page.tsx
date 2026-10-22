@@ -114,7 +114,7 @@ export default function SeasonalProductDetailPage() {
       )}
 
       {/* Top Breadcrumb Bar */}
-      <div className="bg-[#FCEAD2] border-b border-orange-200/60 py-3.5 px-4">
+      <div className="bg-[#FFFFF0] border-b border-[#fafc97] py-3.5 px-4 shadow-2xs">
         <div className="container mx-auto flex items-center text-xs text-gray-700 space-x-2">
           <Link href="/" className="hover:text-brand font-medium transition-colors">
             {t("detail.breadcrumbHome") || "Trang chủ"}
@@ -272,64 +272,63 @@ export default function SeasonalProductDetailPage() {
               </div>
             )}
 
-            {/* Purchase Card */}
-            <div className="bg-[#FFCD74] rounded-3xl p-5 sm:p-6 shadow-sm border border-amber-300/60 mt-4 space-y-4">
+            {/* Purchase Card with Brand Pastel Palette */}
+            <div className="bg-[#FFFFF0] rounded-3xl p-5 sm:p-6 shadow-sm border-2 border-[#fafc97] mt-4 space-y-4">
               
-              {/* Quantity Selector */}
-              <div className="flex items-center justify-between">
-                <span className="text-xs sm:text-sm font-bold text-brand-choco uppercase tracking-wide">
-                  {t("detail.quantity") || "Số lượng:"}
-                </span>
-
-                <div className="flex items-center bg-white rounded-xl border border-amber-400/80 shadow-xs overflow-hidden">
+              {/* Row 1: Quantity Selector + Add to Cart */}
+              <div className="flex items-center gap-3">
+                {/* Quantity Counter */}
+                <div className="flex items-center bg-white rounded-xl border border-gray-200 overflow-hidden shadow-xs h-12 shrink-0">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-9 h-9 flex items-center justify-center text-brand-choco hover:bg-orange-50 font-bold transition-colors cursor-pointer text-base"
+                    className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-[#404d9b] hover:bg-[#fafc97]/30 font-bold text-lg transition-colors cursor-pointer"
                     aria-label="Decrease quantity"
                   >
                     -
                   </button>
-                  <span className="w-10 text-center font-bold text-sm text-brand-choco select-none">
+                  <span className="w-12 text-center font-bold text-[#404d9b] text-base bg-[#fafc97]/50 h-full flex items-center justify-center select-none">
                     {quantity}
                   </span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="w-9 h-9 flex items-center justify-center text-brand-choco hover:bg-orange-50 font-bold transition-colors cursor-pointer text-base"
+                    className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-[#404d9b] hover:bg-[#fafc97]/30 font-bold text-lg transition-colors cursor-pointer"
                     aria-label="Increase quantity"
                   >
                     +
                   </button>
                 </div>
-              </div>
 
-              {/* Action Buttons */}
-              <div className="space-y-2.5 pt-1">
+                {/* Add to Cart (Brand Navy #404d9b) */}
                 <button
                   onClick={handleAddToCart}
-                  className="w-full bg-[#18233C] hover:bg-[#0f172a] text-white font-bold py-3.5 px-6 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer hover:shadow-lg active:scale-98 text-sm"
+                  className="flex-1 h-12 bg-[#404d9b] hover:bg-[#323d80] text-white rounded-xl font-bold text-sm md:text-base flex items-center justify-center gap-2.5 shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-98"
                 >
                   <ShoppingBag size={18} />
                   <span>{t("detail.addToCartBtn") || "Thêm vào giỏ hàng"}</span>
                 </button>
+              </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <button
-                    onClick={handleBuyNow}
-                    className="w-full bg-[#C24127] hover:bg-[#a5331c] text-white font-bold py-3 px-4 rounded-2xl transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm"
-                  >
-                    <span>{t("detail.buyNowBtn") || "Mua ngay"}</span>
-                    <ArrowRight size={15} />
-                  </button>
+              {/* Row 2: Buy Now (#f17daa) + Consult Zalo (#23bbb7) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  onClick={handleBuyNow}
+                  className="h-12 bg-[#f17daa] hover:bg-[#e06896] text-white rounded-xl font-bold text-sm md:text-base flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-98"
+                >
+                  <span>{t("detail.buyNowBtn") || "Mua ngay"}</span>
+                  <ArrowRight size={15} />
+                </button>
 
-                  <a
-                    href="https://zalo.me/0909123456"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full bg-[#FFB82E] hover:bg-[#f5ad22] text-brand-choco font-bold py-3 px-4 rounded-2xl transition-all shadow-sm flex items-center justify-center gap-1.5 text-xs sm:text-sm border border-amber-500/30 text-center"
-                  >
-                    <span>{t("detail.contactZalo") || "Liên hệ tư vấn (Zalo)"}</span>
-                  </a>
-                </div>
+                <a
+                  href="https://zalo.me/0909123456"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-12 bg-[#23bbb7] hover:bg-[#1da29e] text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg cursor-pointer"
+                >
+                  <span>{t("detail.contactZalo") || "Liên hệ tư vấn (Zalo)"}</span>
+                  <span className="w-5 h-5 rounded-full bg-white text-[#23bbb7] text-[10px] flex items-center justify-center font-black tracking-tight shadow-xs">
+                    Zalo
+                  </span>
+                </a>
               </div>
             </div>
 
