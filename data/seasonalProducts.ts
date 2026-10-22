@@ -66,58 +66,6 @@ export const INITIAL_SEASONAL_PRODUCTS: SeasonalProduct[] = [
     ],
     "gallery": [],
     "priceUnit": "set 12 bánh"
-  },
-  {
-    "id": "seasonal-3",
-    "name": "Dâu Tây Rượu Champagne (Valentine Strawberry Rosé)",
-    "desc": "Vị chua ngọt thanh nhã của dâu tây kết hợp men say tinh tế của vang hồng nổ",
-    "price": "45.000đ",
-    "color": "bg-[#FCE7F3]",
-    "textColor": "text-[#9D174D]",
-    "image": "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?auto=format&fit=crop&w=800&q=85",
-    "category": "Valentine",
-    "seasonTag": "Valentine 💖",
-    "isPopular": true,
-    "isNew": false,
-    "ingredients": "Dâu tây Đà Lạt tươi mọng, Rượu vang nổ Sparkling Rosé cao cấp, Bột hạnh nhân cao cấp, Kem whipping Pháp, Bụi vàng thực phẩm",
-    "fullDesc": "Được mệnh danh là biểu tượng tình yêu của Treat Sweet, chiếc macaron hồng phấn phủ bụi vàng thực phẩm lấp lánh mang lại cảm giác lãng mạn vô tận. Phần nhân là sự hòa quyện nhịp nhàng giữa mứt dâu tây nấu chậm và sốt ganache rượu vang nổ thoang thoảng nốt men say quyến rũ.",
-    "structure": [
-      "Vỏ bánh: Màu hồng pastel dịu dàng phủ bụi vàng ngọc trai, nướng nở chân ren đều tăm tắp",
-      "Nhân bánh: Lõi mứt dâu tây tươi sánh mịn bọc quanh lớp ganache Champagne Rosé",
-      "Hậu vị: Nốt hương men rượu vang nổ và quả mọng bung tỏa ngây ngất"
-    ],
-    "gallery": [
-      "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=800&q=85"
-    ]
-  },
-  {
-    "id": "seasonal-4",
-    "name": "Hạt Dẻ Nướng Mật Ong Rừng (Winter Roasted Chestnut)",
-    "desc": "Hạt dẻ Trùng Khánh nướng củi thơm nức, quyện mật ong rừng nguyên chất bùi béo",
-    "price": "42.000đ",
-    "color": "bg-[#F5EBE1]",
-    "textColor": "text-[#633917]",
-    "image": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=800&q=85",
-    "category": "Mùa Đông",
-    "seasonTag": "Mùa Đông ❄️",
-    "isPopular": false,
-    "isNew": true,
-    "ingredients": "Hạt dẻ Trùng Khánh nướng chín, Mật ong hoa rừng tự nhiên, Bơ tươi Pháp, Vani Bourbon, Hạnh nhân lát nướng",
-    "fullDesc": "Gợi nhớ đến những bếp than hồng ấm cúng giữa trời đông giá lạnh. Từng hạt dẻ được tách vỏ thủ công, hấp chín mềm rồi xay mịn cùng mật ong hoa rừng sánh dẻo. Kem hạt dẻ có độ sánh đặc mịn màng, vị bùi béo tự nhiên mà không hề ngấy.",
-    "structure": [
-      "Vỏ bánh: Nâu hạt dẻ mộc mạc, rắc mảnh hạnh nhân lát nướng giòn rụm",
-      "Nhân bánh: Mousse hạt dẻ đậm đặc nấu cùng mật ong hoa dại và bơ sữa Pháp",
-      "Hậu vị: Vị ngọt thanh của mật ong quyện cùng hương bùi béo ấm áp sâu lắng"
-    ],
-    "gallery": [
-      "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?auto=format&fit=crop&w=800&q=85"
-    ]
   }
 ];
 
