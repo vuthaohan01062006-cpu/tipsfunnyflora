@@ -95,10 +95,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       "Nhân bánh: Kem mint ganache the mát sảng khoái, không hề nồng gắt",
       "Hậu vị: Luồng khí mát lành lưu lại nơi cuống họng, nhẹ tênh và sảng khoái"
     ],
-    "gallery": [
-      "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85"
-    ]
+    "gallery": []
   },
   {
     "id": 5,
