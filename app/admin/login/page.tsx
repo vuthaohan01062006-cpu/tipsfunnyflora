@@ -35,6 +35,8 @@ export default function AdminLoginPage() {
     setUsername("admin");
     setPassword("macaron2026");
     setError("");
+  };
+
   const handleQuickLogin = () => {
     localStorage.setItem("admin_logged_in", "true");
     localStorage.setItem("admin_login_time", Date.now().toString());
