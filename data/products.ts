@@ -75,11 +75,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       "Nhân bánh: Lớp kem chanh (Lemon Curd) nấu chậm mượt mà với độ chua tươi mới",
       "Hậu vị: Dư vị chua ngọt đan xen kích thích vị giác và bừng tỉnh năng lượng"
     ],
-    "gallery": [
-      "https://images.unsplash.com/photo-1570476922354-81227cdbb76c?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=800&q=85"
-    ]
+    "gallery": []
   },
   {
     "id": 4,
