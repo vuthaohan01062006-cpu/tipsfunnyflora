@@ -90,17 +90,6 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
       "author": "Small Treat, Sweet Day"
     },
     {
-      "id": 4,
-      "title": "Cẩm nang mix hộp Custom Box: Đọc vị tính cách người thương qua từng nốt hương",
-      "category": "Quà tặng",
-      "date": "16/10/2026",
-      "readTime": "6 phút đọc",
-      "excerpt": "Người bạn thương là cô gái mộng mơ, chàng trai nội tâm sâu sắc, hay người mẹ thích sự thanh tao mộc mạc? Khám phá nghệ thuật chọn vị macaron chuẩn gu để hộp quà trở thành kỷ vật độc bản.",
-      "content": "Một món quà chạm đến trái tim là món quà cho thấy người tặng đã thấu hiểu người nhận sâu sắc đến nhường nào. Đừng chỉ chọn đại một hộp bánh ngẫu nhiên, hãy biến hộp Custom Box 6 hoặc 12 chiếc của Treat Sweet thành một \"bản giao hưởng hương vị\" dành riêng cho người ấy:\n\n1. Dành cho cô nàng ngọt ngào, mộng mơ:\n• Dâu Tây Rượu Champagne: Vị ngọt thanh của dâu tây Pháp quyện chút men say nồng nàn.\n• Vani Bourbon Madagascar: Hương thơm ấm áp, dịu êm như cái ôm buổi sớm.\n• Mâm Xôi Hoa Hồng: Từng cánh hoa hồng bung nở trong khoang miệng.\n\n2. Dành cho chàng trai điềm đạm, sâu sắc:\n• Socola Đen Ganache 70%: Đắng nhẹ đầu lưỡi, ngọt hậu bền bỉ, mạnh mẽ và nam tính.\n• Cà Phê Muối Biển Caramel: Chút mặn mà xua tan mệt mỏi, tràn đầy năng lượng tỉnh táo.\n\n3. Dành cho Mẹ và những người trân quý sự thanh tao:\n• Trà Xanh Matcha Uji Kyoto: Vị chát thanh thoát chuẩn trà đạo Nhật Bản, thanh lọc tâm hồn.\n• Hạnh Nhân Rang Bơ Pháp: Thơm bùi nguyên bản, vị ngọt ít thanh nhã.\n\n4. Dành cho dịp lễ hội & Kỷ niệm đặc biệt:\n• BST Theo Mùa (Seasonal Specials): Bí ngô quế gừng ấm cúng mùa thu, hay kẹo bạc hà tuyết giáng sinh rộn ràng.\n\nMỗi hộp quà Custom Box tại Treat Sweet đều được dập kim nhũ vàng sang trọng, thắt nơ ruy băng lụa mềm và kèm theo thiệp viết tay nhắn gửi lời yêu thương. Hãy nhắn tin cho chúng mình để cùng tạo nên chiếc hộp quà đong đầy cảm xúc nhất nhé!",
-      "image": "https://images.unsplash.com/photo-1558326567-98ae2405596b?auto=format&fit=crop&w=1200&q=85",
-      "author": "Bếp Bánh Treat Sweet"
-    },
-    {
       "id": 5,
       "title": "Bí mật của chiếc viền chân ren (Pied) hoàn hảo",
       "category": "Kỹ thuật",
