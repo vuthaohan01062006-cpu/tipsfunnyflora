@@ -67,7 +67,7 @@ export const INITIAL_PRODUCTS: Product[] = [
   {
     "id": 6,
     "name": "Dâu Tây",
-    "desc": "Ngọt chua nhẹ tênh – Năng lượng tươi vui, rạng rỡ.",
+    "desc": "chua dịu ngọt thanh cho ngày rạng rỡ\n",
     "price": "35.000đ",
     "color": "bg-[#FFD1DC]",
     "textColor": "text-brand-choco",
