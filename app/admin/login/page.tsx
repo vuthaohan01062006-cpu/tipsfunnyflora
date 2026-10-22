@@ -7,8 +7,8 @@ import { Lock, User, ArrowLeft, CheckCircle2, AlertCircle } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("admin");
+  const [password, setPassword] = useState("macaron2026");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,6 +35,11 @@ export default function AdminLoginPage() {
     setUsername("admin");
     setPassword("macaron2026");
     setError("");
+  const handleQuickLogin = () => {
+    localStorage.setItem("admin_logged_in", "true");
+    localStorage.setItem("admin_login_time", Date.now().toString());
+    document.cookie = "admin_auth=true; path=/; max-age=86400";
+    router.push("/admin");
   };
 
   return (
@@ -47,13 +52,32 @@ export default function AdminLoginPage() {
           Treat Sweet <span className="text-brand">Admin</span>
         </h1>
         <p className="mt-2 text-sm text-brand-choco/70">
-          Đăng nhập hệ thống quản lý sản phẩm & hình ảnh
+          Cổng quản trị toàn diện: Banner, 7 Vị Bánh, Sản phẩm theo mùa, Blog, Custom Box, Về chúng mình, Liên hệ
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-xl rounded-3xl sm:px-10 border border-brand-vanilla">
-          <form className="space-y-6" onSubmit={handleLogin}>
+        <div className="bg-white py-8 px-6 shadow-xl rounded-3xl sm:px-10 border border-brand-vanilla space-y-6">
+          
+          {/* 1-Click Fast Login Button */}
+          <div className="p-4 bg-gradient-to-r from-brand-vanilla via-[#FFF0F5] to-brand-vanilla rounded-2xl border border-brand/30 text-center">
+            <p className="text-xs font-bold text-brand-choco mb-2">Quyền Quản Trị Viên Đầy Đủ Đã Sẵn Sàng</p>
+            <button
+              type="button"
+              onClick={handleQuickLogin}
+              className="w-full py-3 px-4 rounded-xl shadow-md text-sm font-black text-white bg-brand hover:bg-brand-dark transition-all cursor-pointer flex items-center justify-center gap-2"
+            >
+              <span>⚡ ĐĂNG NHẬP NHANH QUẢN TRỊ (1-CLICK)</span>
+            </button>
+            <span className="text-[11px] text-brand-choco/70 block mt-2">Bấm nút trên để vào thẳng trang quản trị mà không cần gõ mật khẩu!</span>
+          </div>
+
+          <div className="relative flex items-center justify-center">
+            <div className="border-t border-gray-200 w-full"></div>
+            <span className="bg-white px-3 text-xs text-gray-400 uppercase font-semibold">hoặc đăng nhập thủ công</span>
+          </div>
+
+          <form className="space-y-5" onSubmit={handleLogin}>
             {error && (
               <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm flex items-center gap-2">
                 <AlertCircle size={18} className="shrink-0" />
