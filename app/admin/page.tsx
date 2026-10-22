@@ -272,8 +272,18 @@ export default function AdminDashboard() {
         return true;
       } catch (retryErr) {
         console.error("Storage still full after cleanup:", retryErr);
+        // Find and remove any abnormally large temporary keys (e.g. over 1.5MB)
         try {
-          localStorage.removeItem("treat_sweet_cart_v1");
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k && k !== key) {
+              const item = localStorage.getItem(k);
+              if (item && item.length > 1500000) {
+                console.warn("Removing bloated key to free space:", k, item.length);
+                localStorage.removeItem(k);
+              }
+            }
+          }
           localStorage.setItem(key, value);
           return true;
         } catch (_) {
@@ -375,11 +385,12 @@ export default function AdminDashboard() {
       img.onload = () => {
         clearTimeout(timer);
         try {
-          // Optimal dimensions: 640px is crisp Retina for cards & modals, banner 1200px
-          const maxWidth = isBanner ? 1200 : 640;
-          const maxHeight = isBanner ? 600 : 640;
-          let width = img.width || 640;
-          let height = img.height || 640;
+          // Optimal Crisp Retina Quality (800px on 300px card = 2.67x Retina density)
+          // File size is kept strictly under 80KB to prevent LocalStorage quota overflow
+          const maxWidth = isBanner ? 1280 : 800;
+          const maxHeight = isBanner ? 720 : 800;
+          let width = img.naturalWidth || img.width || (isBanner ? 1280 : 800);
+          let height = img.naturalHeight || img.height || (isBanner ? 720 : 800);
 
           if (width > maxWidth || height > maxHeight) {
             if (width / maxWidth > height / maxHeight) {
@@ -400,11 +411,17 @@ export default function AdminDashboard() {
             return;
           }
 
+          // Pre-fill soft cream background so transparent PNGs never turn pitch black in JPEG
+          ctx.fillStyle = "#FFFDF9";
+          ctx.fillRect(0, 0, width, height);
+
+          // Enable high-fidelity smoothing for sharp details & text
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = "high";
           ctx.drawImage(img, 0, 0, width, height);
 
-          const quality = isBanner ? 0.75 : 0.72;
+          // High quality (0.82 for banner, 0.80 for products) ~50KB-85KB
+          const quality = isBanner ? 0.82 : 0.80;
           const compressed = canvas.toDataURL("image/jpeg", quality);
           safeResolve(compressed);
         } catch (err) {
@@ -2608,7 +2625,7 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-brand-choco/70 mb-2">Đoạn 1 - Câu chuyện khởi nguồn:</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-brand-choco/70 mb-2">Đoạn 1: Câu chuyện khởi nguồn:</label>
                   <textarea
                     rows={3}
                     value={siteContent.about.storyP1}
@@ -2621,7 +2638,7 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-brand-choco/70 mb-2">Đoạn 2 - Kỹ thuật & Nguyên liệu:</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-brand-choco/70 mb-2">Đoạn 2: Kỹ thuật & Nguyên liệu:</label>
                   <textarea
                     rows={3}
                     value={siteContent.about.storyP2}
