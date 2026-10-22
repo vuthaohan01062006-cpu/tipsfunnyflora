@@ -55,11 +55,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       "Nhân bánh: Kem matcha ganache đậm đặc, cân bằng vị chát nhẹ và độ ngọt kem béo",
       "Hậu vị: Nốt hương thảo mộc trà xanh lan tỏa bền bỉ và thư thái"
     ],
-    "gallery": [
-      "https://images.unsplash.com/photo-1558326567-98ae2405596b?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
-      "https://images.unsplash.com/photo-1570476922354-81227cdbb76c?auto=format&fit=crop&w=800&q=85"
-    ]
+    "gallery": []
   },
   {
     "id": 3,
