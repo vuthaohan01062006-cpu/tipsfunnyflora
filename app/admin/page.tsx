@@ -20,6 +20,11 @@ import {
   SITE_CONTENT_STORAGE_KEY 
 } from "@/data/siteContent";
 import { 
+  INITIAL_SEASONAL_PRODUCTS, 
+  SeasonalProduct, 
+  SEASONAL_STORAGE_KEY 
+} from "@/data/seasonalProducts";
+import { 
   Upload, 
   Trash2, 
   Plus, 
@@ -43,10 +48,11 @@ import {
   Clock,
   MapPin,
   Mail,
-  Share2
+  Share2,
+  X
 } from "lucide-react";
 
-type TabType = "banner" | "products" | "blogs" | "customBox" | "about" | "contact";
+type TabType = "banner" | "products" | "seasonal" | "blogs" | "customBox" | "about" | "contact";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -54,6 +60,7 @@ export default function AdminDashboard() {
   
   // Data states
   const [products, setProducts] = useState<Product[]>([]);
+  const [seasonalProducts, setSeasonalProducts] = useState<SeasonalProduct[]>([]);
   const [banner, setBanner] = useState<BannerConfig>(DEFAULT_BANNER);
   const [siteContent, setSiteContent] = useState<SiteContent>(DEFAULT_SITE_CONTENT);
 
@@ -76,6 +83,22 @@ export default function AdminDashboard() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | number | null>(null);
   const [editForm, setEditForm] = useState<Product | null>(null);
+
+  // Form state for adding new seasonal product
+  const [newSeasonal, setNewSeasonal] = useState({
+    name: "",
+    seasonTag: "Mùa Thu 🍂",
+    desc: "",
+    price: "42.000đ",
+    color: "bg-[#FBE8D3]",
+    image: "",
+    category: "Mùa Thu",
+    ingredients: "",
+    fullDesc: "",
+  });
+  const [showAddSeasonalForm, setShowAddSeasonalForm] = useState(false);
+  const [editingSeasonalId, setEditingSeasonalId] = useState<string | number | null>(null);
+  const [editSeasonalForm, setEditSeasonalForm] = useState<SeasonalProduct | null>(null);
 
   // Form state for adding new blog post
   const [newBlog, setNewBlog] = useState<Partial<BlogPost>>({
@@ -128,6 +151,18 @@ export default function AdminDashboard() {
       setBanner(DEFAULT_BANNER);
     }
 
+    // Load seasonal products
+    try {
+      const savedSeasonal = localStorage.getItem(SEASONAL_STORAGE_KEY);
+      if (savedSeasonal) {
+        setSeasonalProducts(JSON.parse(savedSeasonal));
+      } else {
+        setSeasonalProducts(INITIAL_SEASONAL_PRODUCTS);
+      }
+    } catch {
+      setSeasonalProducts(INITIAL_SEASONAL_PRODUCTS);
+    }
+
     // Load site content
     try {
       const savedContent = localStorage.getItem(SITE_CONTENT_STORAGE_KEY);
@@ -165,6 +200,12 @@ export default function AdminDashboard() {
     setProducts(newProductsList);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newProductsList));
     showNotification("Đã lưu danh sách bánh! Website đã cập nhật ngay.", "success");
+  };
+
+  const saveSeasonalToLocal = (newSeasonalList: SeasonalProduct[]) => {
+    setSeasonalProducts(newSeasonalList);
+    localStorage.setItem(SEASONAL_STORAGE_KEY, JSON.stringify(newSeasonalList));
+    showNotification("Đã lưu danh sách bánh theo mùa! Website đã cập nhật ngay.", "success");
   };
 
   const saveBannerToLocal = (updatedBanner: BannerConfig) => {
@@ -209,6 +250,9 @@ export default function AdminDashboard() {
       } else if (uploadTargetId === "new_product") {
         setNewProduct(prev => ({ ...prev, image: base64Url }));
         showNotification("Đã chọn ảnh cho sản phẩm mới!", "info");
+      } else if (uploadTargetId === "new_seasonal") {
+        setNewSeasonal(prev => ({ ...prev, image: base64Url }));
+        showNotification("Đã chọn ảnh cho bánh theo mùa mới!", "info");
       } else if (uploadTargetId === "new_blog") {
         setNewBlog(prev => ({ ...prev, image: base64Url }));
         showNotification("Đã chọn ảnh bìa cho bài viết Blog mới!", "info");
@@ -218,6 +262,13 @@ export default function AdminDashboard() {
           String(b.id) === bId ? { ...b, image: base64Url } : b
         );
         saveSiteContentToLocal({ ...siteContent, blogs: updatedBlogs }, "Sau Lớp Vỏ");
+      } else if (typeof uploadTargetId === "string" && uploadTargetId.startsWith("seasonal_")) {
+        const sId = uploadTargetId.replace("seasonal_", "");
+        const updated = seasonalProducts.map(s => 
+          String(s.id) === sId ? { ...s, image: base64Url } : s
+        );
+        saveSeasonalToLocal(updated);
+        showNotification("Đã cập nhật ảnh bánh theo mùa thành công!", "success");
       } else if (uploadTargetId !== null) {
         const updated = products.map(p => 
           p.id === uploadTargetId ? { ...p, image: base64Url } : p
@@ -331,7 +382,69 @@ export default function AdminDashboard() {
     setEditForm(null);
   };
 
-  // Publish All Data (Products, Banner, SiteContent) to GitHub & Vercel
+  // ==================== SEASONAL PRODUCT ACTIONS ====================
+  const handleAddSeasonal = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newSeasonal.name.trim()) {
+      showNotification("Vui lòng nhập tên bánh theo mùa!", "error");
+      return;
+    }
+
+    const created: SeasonalProduct = {
+      id: `seasonal-${Date.now()}`,
+      name: newSeasonal.name.trim(),
+      seasonTag: newSeasonal.seasonTag.trim() || "Mùa Thu 🍂",
+      desc: newSeasonal.desc.trim() || "Hương vị bánh ngọt phiên bản giới hạn theo mùa.",
+      price: newSeasonal.price.trim() || "42.000đ",
+      color: newSeasonal.color || "bg-[#FBE8D3]",
+      textColor: "text-brand-choco",
+      image: newSeasonal.image || "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=85",
+      category: newSeasonal.category || newSeasonal.seasonTag.replace(/[^\p{L}\s]/gu, "").trim() || "Mùa Thu",
+      ingredients: newSeasonal.ingredients || "Nguyên liệu tự nhiên tuyển chọn theo mùa, Bơ Pháp Anchor",
+      fullDesc: newSeasonal.fullDesc || newSeasonal.desc,
+      isNew: true,
+      isPopular: true,
+      structure: [
+        "Vỏ bánh: Giòn nhẹ ngoài rìa, xốp dẻo bên trong nướng chuẩn viền pied",
+        "Nhân kem: Ganache đậm vị theo mùa hòa quyện bơ sữa thơm ngậy",
+        "Hậu vị: Ngọt ngào thanh tao đọng lại dài lâu"
+      ],
+      gallery: [
+        newSeasonal.image || "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=85",
+        "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
+        "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?auto=format&fit=crop&w=800&q=85"
+      ]
+    };
+
+    saveSeasonalToLocal([...seasonalProducts, created]);
+    setNewSeasonal({
+      name: "",
+      seasonTag: "Mùa Thu 🍂",
+      desc: "",
+      price: "42.000đ",
+      color: "bg-[#FBE8D3]",
+      image: "",
+      category: "Mùa Thu",
+      ingredients: "",
+      fullDesc: "",
+    });
+    setShowAddSeasonalForm(false);
+  };
+
+  const handleDeleteSeasonal = (id: string | number, name: string) => {
+    if (confirm(`Bạn có chắc muốn xóa bánh theo mùa "${name}" không?`)) {
+      saveSeasonalToLocal(seasonalProducts.filter(s => String(s.id) !== String(id)));
+    }
+  };
+
+  const saveEditSeasonal = () => {
+    if (!editSeasonalForm) return;
+    saveSeasonalToLocal(seasonalProducts.map(s => String(s.id) === String(editSeasonalForm.id) ? editSeasonalForm : s));
+    setEditingSeasonalId(null);
+    setEditSeasonalForm(null);
+  };
+
+  // Publish All Data (Products, Banner, SiteContent, SeasonalProducts) to GitHub & Vercel
   const handlePublishToLive = async () => {
     setIsPublishing(true);
     showNotification("Đang xuất bản toàn bộ nội dung lên GitHub & Vercel...", "info");
@@ -340,7 +453,7 @@ export default function AdminDashboard() {
       const res = await fetch("/api/admin/publish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ products, banner, siteContent }),
+        body: JSON.stringify({ products, banner, siteContent, seasonalProducts }),
       });
 
       const data = await res.json();
@@ -463,6 +576,18 @@ export default function AdminDashboard() {
           >
             <Cookie size={16} />
             <span>7 Vị Bánh Macaron</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("seasonal")}
+            className={`flex items-center gap-1.5 px-4 py-2.5 rounded-2xl font-bold text-xs md:text-sm transition-all shrink-0 cursor-pointer ${
+              activeTab === "seasonal"
+                ? "bg-amber-600 text-white shadow-md"
+                : "bg-white text-brand-choco hover:bg-brand-vanilla border border-gray-200"
+            }`}
+          >
+            <Sparkles size={16} />
+            <span>Sản Phẩm Theo Mùa ({seasonalProducts.length})</span>
           </button>
 
           <button
@@ -757,7 +882,387 @@ export default function AdminDashboard() {
         )}
 
         {/* ========================================================= */}
-        {/* TAB 3: SAU LỚP VỎ (BLOG) */}
+        {/* TAB 3: SẢN PHẨM THEO MÙA (SEASONAL SPECIALS) */}
+        {/* ========================================================= */}
+        {activeTab === "seasonal" && (
+          <div className="space-y-8 animate-fadeIn">
+            <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-[#FFF7ED] p-6 rounded-3xl border border-amber-200/80 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <h2 className="text-lg font-bold text-brand-choco mb-1 flex items-center gap-2">
+                  <Sparkles size={18} className="text-amber-600" /> Quản Lý Sản Phẩm Đặc Biệt Theo Mùa (Seasonal)
+                </h2>
+                <p className="text-sm text-brand-choco/80 max-w-2xl">
+                  Quản lý các dòng bánh phiên bản giới hạn theo từng dịp lễ và mùa trong năm (Mùa Thu, Giáng Sinh, Valentine, Mùa Đông...). Bấm <strong>"Tải ảnh mới"</strong> trên từng bánh để đổi ảnh từ máy tính hoặc Canva.
+                </p>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                <button
+                  onClick={() => setShowAddSeasonalForm(!showAddSeasonalForm)}
+                  className="inline-flex items-center text-xs font-bold px-4 py-2.5 rounded-xl bg-amber-600 text-white hover:bg-amber-700 transition-colors shadow-sm cursor-pointer"
+                >
+                  <Plus size={16} className="mr-1" /> Thêm bánh theo mùa mới
+                </button>
+                <button
+                  onClick={() => {
+                    if (confirm("Khôi phục danh sách bánh theo mùa ban đầu?")) {
+                      saveSeasonalToLocal(INITIAL_SEASONAL_PRODUCTS);
+                    }
+                  }}
+                  className="inline-flex items-center text-xs font-medium px-3 py-2.5 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 transition-colors cursor-pointer"
+                >
+                  <RefreshCw size={14} className="mr-1" /> Khôi phục mặc định
+                </button>
+              </div>
+            </div>
+
+            {/* Add New Seasonal Product Form */}
+            {showAddSeasonalForm && (
+              <div className="bg-white p-6 md:p-8 rounded-3xl border border-amber-300/80 shadow-md animate-fadeIn">
+                <h3 className="text-lg font-bold text-brand-choco mb-4 flex items-center gap-2">
+                  <Plus size={18} className="text-amber-600" /> Thêm Bánh Theo Mùa Mới
+                </h3>
+                <form onSubmit={handleAddSeasonal} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Tên bánh theo mùa *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="VD: Bí Ngô Quế Gừng (Autumn Pumpkin Spice)"
+                      value={newSeasonal.name}
+                      onChange={(e) => setNewSeasonal({ ...newSeasonal, name: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Nhãn Mùa / Dịp Lễ Hội *</label>
+                    <select
+                      value={newSeasonal.seasonTag}
+                      onChange={(e) => {
+                        const tag = e.target.value;
+                        setNewSeasonal({ 
+                          ...newSeasonal, 
+                          seasonTag: tag,
+                          category: tag.replace(/[^\p{L}\s]/gu, "").trim()
+                        });
+                      }}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none bg-white"
+                    >
+                      <option value="Mùa Thu 🍂">Mùa Thu 🍂</option>
+                      <option value="Giáng Sinh 🎄">Giáng Sinh 🎄</option>
+                      <option value="Valentine 💖">Valentine 💖</option>
+                      <option value="Mùa Đông ❄️">Mùa Đông ❄️</option>
+                      <option value="Mùa Hè ☀️">Mùa Hè ☀️</option>
+                      <option value="Lễ Hội ✨">Lễ Hội ✨</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Giá bán niêm yết</label>
+                    <input
+                      type="text"
+                      placeholder="VD: 42.000đ"
+                      value={newSeasonal.price}
+                      onChange={(e) => setNewSeasonal({ ...newSeasonal, price: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Tông màu nền thẻ bánh</label>
+                    <select
+                      value={newSeasonal.color}
+                      onChange={(e) => setNewSeasonal({ ...newSeasonal, color: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none bg-white"
+                    >
+                      <option value="bg-[#FBE8D3]">Cam ấm mùa thu (#FBE8D3)</option>
+                      <option value="bg-[#E6F4F1]">Xanh tuyết giáng sinh (#E6F4F1)</option>
+                      <option value="bg-[#FCE7F3]">Hồng phấn Valentine (#FCE7F3)</option>
+                      <option value="bg-[#F5EBE1]">Nâu hạt dẻ mùa đông (#F5EBE1)</option>
+                      <option value="bg-[#FDF8E1]">Vàng kem vani (#FDF8E1)</option>
+                      <option value="bg-[#D0E3C5]">Xanh matcha thanh mát (#D0E3C5)</option>
+                    </select>
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Mô tả ngắn cảm xúc</label>
+                    <input
+                      type="text"
+                      placeholder="VD: Hương bí đỏ nghiền béo bùi thoảng nốt quế gừng ấm cúng xua tan se lạnh"
+                      value={newSeasonal.desc}
+                      onChange={(e) => setNewSeasonal({ ...newSeasonal, desc: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Thành phần nguyên liệu theo mùa</label>
+                    <input
+                      type="text"
+                      placeholder="VD: Bí ngô đỏ nghiền nhuyễn, Bột quế Ceylon hữu cơ, Gừng tươi già, Socola trắng Pháp Valrhona"
+                      value={newSeasonal.ingredients}
+                      onChange={(e) => setNewSeasonal({ ...newSeasonal, ingredients: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Hình ảnh bánh</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Link ảnh hoặc bấm Tải ảnh từ máy"
+                        value={newSeasonal.image}
+                        onChange={(e) => setNewSeasonal({ ...newSeasonal, image: e.target.value })}
+                        className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => triggerImageUpload("new_seasonal")}
+                        className="px-4 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-xl text-xs font-bold cursor-pointer transition-colors flex items-center gap-1.5 shrink-0"
+                      >
+                        <Upload size={14} /> Tải ảnh từ máy
+                      </button>
+                    </div>
+
+                    {newSeasonal.image && (
+                      <div className="mt-3 flex items-center gap-3 p-3 bg-amber-50/60 rounded-2xl border border-amber-200/60">
+                        <img src={newSeasonal.image} alt="Xem trước" className="w-16 h-16 rounded-xl object-cover" />
+                        <div className="text-xs text-gray-600">
+                          <span className="font-bold text-amber-900 block">Xem trước ảnh bánh</span>
+                          <span>Ảnh sẽ hiển thị sắc nét ngoài trang bộ sưu tập và trang chi tiết</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Mô tả chi tiết / Câu chuyện hương vị</label>
+                    <textarea
+                      rows={3}
+                      placeholder="Câu chuyện cảm hứng đằng sau chiếc bánh theo mùa..."
+                      value={newSeasonal.fullDesc}
+                      onChange={(e) => setNewSeasonal({ ...newSeasonal, fullDesc: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2 flex justify-end gap-3 pt-3 border-t border-gray-100">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddSeasonalForm(false)}
+                      className="px-4 py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+                    >
+                      Hủy bỏ
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
+                    >
+                      Lưu Bánh Theo Mùa Mới
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {/* Grid of Seasonal Products */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {seasonalProducts.map((s) => (
+                <div 
+                  key={s.id} 
+                  className="bg-white rounded-3xl border border-amber-100/90 shadow-sm overflow-hidden flex flex-col justify-between group hover:shadow-md transition-shadow"
+                >
+                  {/* Image with upload trigger */}
+                  <div className={`relative aspect-[4/3] ${s.color || "bg-amber-50"} overflow-hidden`}>
+                    <img 
+                      src={s.image || "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=85"} 
+                      alt={s.name} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                    />
+                    
+                    {/* Season Tag Badge */}
+                    <div className="absolute top-3 left-3 z-10">
+                      <span className="bg-amber-900/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-xs flex items-center gap-1 backdrop-blur-xs">
+                        <Sparkles size={10} className="text-amber-300" />
+                        <span>{s.seasonTag}</span>
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() => triggerImageUpload(`seasonal_${s.id}`)}
+                      className="absolute bottom-3 right-3 bg-white/95 text-brand-choco hover:bg-amber-600 hover:text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1 backdrop-blur-xs"
+                    >
+                      <Upload size={13} /> Tải ảnh mới
+                    </button>
+                  </div>
+
+                  {/* Info */}
+                  <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+                    <div>
+                      <div className="flex justify-between items-start gap-2">
+                        <h4 className="font-bold font-serif text-brand-choco text-base line-clamp-1">{s.name}</h4>
+                        <span className="text-xs font-black text-red-600 font-sans bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200/60 shrink-0">
+                          {s.price || "42.000đ"}
+                        </span>
+                      </div>
+                      <p className="text-xs text-brand-choco/70 line-clamp-2 mt-1.5 leading-relaxed">{s.desc}</p>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                      <div className="flex items-center gap-2">
+                        <Link 
+                          href={`/seasonal/${s.id}`} 
+                          target="_blank" 
+                          className="text-xs text-amber-700 font-bold hover:underline flex items-center gap-1"
+                        >
+                          Xem chi tiết <ExternalLink size={12} />
+                        </Link>
+                        <button
+                          onClick={() => {
+                            setEditingSeasonalId(s.id);
+                            setEditSeasonalForm({ ...s });
+                          }}
+                          className="text-xs text-gray-500 hover:text-brand font-medium flex items-center gap-0.5 ml-2 cursor-pointer"
+                        >
+                          <Edit3 size={12} /> Sửa
+                        </button>
+                      </div>
+
+                      <button 
+                        onClick={() => handleDeleteSeasonal(s.id, s.name)} 
+                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                        title="Xóa bánh theo mùa"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Edit Seasonal Product Modal */}
+            {editingSeasonalId && editSeasonalForm && (
+              <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-xs animate-fadeIn">
+                <div className="bg-white rounded-3xl max-w-2xl w-full p-6 md:p-8 max-h-[90vh] overflow-y-auto shadow-2xl border border-amber-200">
+                  <div className="flex items-center justify-between mb-5 pb-3 border-b border-gray-100">
+                    <h3 className="text-lg font-bold text-brand-choco font-serif flex items-center gap-2">
+                      <Edit3 size={18} className="text-amber-600" /> Chỉnh Sửa Bánh Theo Mùa
+                    </h3>
+                    <button 
+                      onClick={() => { setEditingSeasonalId(null); setEditSeasonalForm(null); }}
+                      className="text-gray-400 hover:text-gray-700 p-1"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Tên bánh</label>
+                      <input
+                        type="text"
+                        value={editSeasonalForm.name}
+                        onChange={(e) => setEditSeasonalForm({ ...editSeasonalForm, name: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">Nhãn mùa</label>
+                        <input
+                          type="text"
+                          value={editSeasonalForm.seasonTag}
+                          onChange={(e) => setEditSeasonalForm({ ...editSeasonalForm, seasonTag: e.target.value })}
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">Giá bán</label>
+                        <input
+                          type="text"
+                          value={editSeasonalForm.price}
+                          onChange={(e) => setEditSeasonalForm({ ...editSeasonalForm, price: e.target.value })}
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Mô tả ngắn</label>
+                      <input
+                        type="text"
+                        value={editSeasonalForm.desc}
+                        onChange={(e) => setEditSeasonalForm({ ...editSeasonalForm, desc: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Thành phần nguyên liệu</label>
+                      <input
+                        type="text"
+                        value={editSeasonalForm.ingredients || ""}
+                        onChange={(e) => setEditSeasonalForm({ ...editSeasonalForm, ingredients: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Link ảnh đại diện</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={editSeasonalForm.image || ""}
+                          onChange={(e) => setEditSeasonalForm({ ...editSeasonalForm, image: e.target.value })}
+                          className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => triggerImageUpload(`seasonal_${editSeasonalForm.id}`)}
+                          className="px-3 py-2 bg-amber-100 text-amber-900 rounded-xl text-xs font-bold cursor-pointer"
+                        >
+                          Tải ảnh
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Mô tả chi tiết / Câu chuyện</label>
+                      <textarea
+                        rows={3}
+                        value={editSeasonalForm.fullDesc || editSeasonalForm.desc}
+                        onChange={(e) => setEditSeasonalForm({ ...editSeasonalForm, fullDesc: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-amber-500 focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-3 border-t border-gray-100">
+                      <button
+                        onClick={() => { setEditingSeasonalId(null); setEditSeasonalForm(null); }}
+                        className="px-4 py-2 rounded-xl border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50"
+                      >
+                        Hủy
+                      </button>
+                      <button
+                        onClick={saveEditSeasonal}
+                        className="px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold shadow-sm"
+                      >
+                        Lưu Thay Đổi
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ========================================================= */}
+        {/* TAB 4: SAU LỚP VỎ (BLOG) */}
         {/* ========================================================= */}
         {activeTab === "blogs" && (
           <div className="space-y-8 animate-fadeIn">
