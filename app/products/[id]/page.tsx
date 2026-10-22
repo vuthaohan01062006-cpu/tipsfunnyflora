@@ -8,6 +8,11 @@ import {
   Product, 
   STORAGE_KEY 
 } from "@/data/products";
+import { 
+  INITIAL_SEASONAL_PRODUCTS, 
+  SeasonalProduct, 
+  SEASONAL_STORAGE_KEY 
+} from "@/data/seasonalProducts";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { 
@@ -24,9 +29,10 @@ export default function ProductDetailPage() {
   const params = useParams();
   const productId = params?.id ? String(params.id) : "1";
 
-  // Initialize immediately with matching product to avoid any blank loading delay
-  const initialFound = INITIAL_PRODUCTS.find(p => String(p.id) === productId) || INITIAL_PRODUCTS[0];
-  const [product, setProduct] = useState<Product>(initialFound);
+  // Initialize immediately with matching product from collection or seasonal
+  const allInitial = [...INITIAL_PRODUCTS, ...INITIAL_SEASONAL_PRODUCTS];
+  const initialFound = allInitial.find(p => String(p.id) === productId) || INITIAL_PRODUCTS[0];
+  const [product, setProduct] = useState<Product | SeasonalProduct>(initialFound);
   const [activeImage, setActiveImage] = useState<string>(initialFound.image || initialFound.gallery?.[0] || "");
   const [quantity, setQuantity] = useState<number>(1);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -36,20 +42,34 @@ export default function ProductDetailPage() {
 
   // Load updated products from localStorage if admin customized them
   useEffect(() => {
-    let currentList = INITIAL_PRODUCTS;
+    let currentProducts = INITIAL_PRODUCTS;
+    let currentSeasonal = INITIAL_SEASONAL_PRODUCTS;
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          currentList = parsed;
+          currentProducts = parsed;
         }
       }
     } catch {
       // fallback
     }
 
-    const found = currentList.find(p => String(p.id) === productId) || currentList[0];
+    try {
+      const savedSeasonal = localStorage.getItem(SEASONAL_STORAGE_KEY);
+      if (savedSeasonal) {
+        const parsedSeasonal = JSON.parse(savedSeasonal);
+        if (Array.isArray(parsedSeasonal) && parsedSeasonal.length > 0) {
+          currentSeasonal = parsedSeasonal;
+        }
+      }
+    } catch {
+      // fallback
+    }
+
+    const combined = [...currentProducts, ...currentSeasonal];
+    const found = combined.find(p => String(p.id) === productId) || combined[0];
     if (found) {
       setProduct(found);
       setActiveImage(found.image || found.gallery?.[0] || "");
