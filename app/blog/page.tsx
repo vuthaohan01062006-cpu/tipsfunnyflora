@@ -24,17 +24,24 @@ export default function BlogPage() {
   const { language, t } = useLanguage();
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(SITE_CONTENT_STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.blogs && Array.isArray(parsed.blogs) && parsed.blogs.length > 0) {
-          setBlogs(parsed.blogs);
+    const reloadBlogs = () => {
+      try {
+        const saved = localStorage.getItem(SITE_CONTENT_STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.blogs && Array.isArray(parsed.blogs) && parsed.blogs.length > 0) {
+            setBlogs(parsed.blogs);
+          }
         }
+      } catch {
+        // fallback
       }
-    } catch {
-      // fallback
-    }
+    };
+
+    reloadBlogs();
+
+    window.addEventListener("storage", reloadBlogs);
+    return () => window.removeEventListener("storage", reloadBlogs);
   }, []);
 
   const categories = ["Tất cả", "Kỹ thuật", "Nguyên liệu", "Cảm xúc", "Sự kiện"];
