@@ -35,7 +35,12 @@ export const INITIAL_PRODUCTS: Product[] = [
       "Lớp kem lót: Ganache sô cô la trắng hòa quyện tinh chất vani Bourbon nguyên chất",
       "Hậu vị: Thoảng nốt bơ sữa thơm ngậy và vị ngọt thanh tao đọng lại dài lâu"
     ],
-    "gallery": []
+    "gallery": [
+      "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
+      "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?auto=format&fit=crop&w=800&q=85",
+      "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=800&q=85",
+      "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=85"
+    ]
   },
   {
     "id": 2,
@@ -55,7 +60,11 @@ export const INITIAL_PRODUCTS: Product[] = [
       "Nhân bánh: Kem matcha ganache đậm đặc, cân bằng vị chát nhẹ và độ ngọt kem béo",
       "Hậu vị: Nốt hương thảo mộc trà xanh lan tỏa bền bỉ và thư thái"
     ],
-    "gallery": []
+    "gallery": [
+      "https://images.unsplash.com/photo-1558326567-98ae2405596b?auto=format&fit=crop&w=800&q=85",
+      "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
+      "https://images.unsplash.com/photo-1570476922354-81227cdbb76c?auto=format&fit=crop&w=800&q=85"
+    ]
   },
   {
     "id": 3,
@@ -75,7 +84,11 @@ export const INITIAL_PRODUCTS: Product[] = [
       "Nhân bánh: Lớp kem chanh (Lemon Curd) nấu chậm mượt mà với độ chua tươi mới",
       "Hậu vị: Dư vị chua ngọt đan xen kích thích vị giác và bừng tỉnh năng lượng"
     ],
-    "gallery": []
+    "gallery": [
+      "https://images.unsplash.com/photo-1570476922354-81227cdbb76c?auto=format&fit=crop&w=800&q=85",
+      "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
+      "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=800&q=85"
+    ]
   },
   {
     "id": 4,
@@ -95,7 +108,10 @@ export const INITIAL_PRODUCTS: Product[] = [
       "Nhân bánh: Kem mint ganache the mát sảng khoái, không hề nồng gắt",
       "Hậu vị: Luồng khí mát lành lưu lại nơi cuống họng, nhẹ tênh và sảng khoái"
     ],
-    "gallery": []
+    "gallery": [
+      "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=800&q=85",
+      "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85"
+    ]
   },
   {
     "id": 5,
@@ -115,8 +131,11 @@ export const INITIAL_PRODUCTS: Product[] = [
       "Nhân bánh: Ganache socola Bỉ nấu sệt sánh mịn, đắng êm dịu mà quyến rũ",
       "Hậu vị: Nốt hương khói cacao trầm ấm lưu lại lâu dài và đầy mê hoặc"
     ],
-    "gallery": [],
-    "priceUnit": "chiếc"
+    "gallery": [
+      "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?auto=format&fit=crop&w=800&q=85",
+      "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
+      "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=800&q=85"
+    ]
   },
   {
     "id": 6,
@@ -136,8 +155,11 @@ export const INITIAL_PRODUCTS: Product[] = [
       "Nhân bánh: Lớp mứt dâu tây rim sệt kết hợp ganache dâu tươi thơm lừng",
       "Hậu vị: Chua ngọt cân bằng, nhẹ nhõm như bước đi giữa khu vườn hoa quả"
     ],
-    "gallery": [],
-    "priceUnit": "chiếc"
+    "gallery": [
+      "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=85",
+      "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
+      "https://images.unsplash.com/photo-1570476922354-81227cdbb76c?auto=format&fit=crop&w=800&q=85"
+    ]
   },
   {
     "id": 7,
@@ -157,8 +179,11 @@ export const INITIAL_PRODUCTS: Product[] = [
       "Nhân bánh: Lõi mứt việt quất chua đượm bọc ngoài bởi lớp phô mai Mascarpone béo mịn",
       "Hậu vị: Nốt béo ngậy của kem sữa hòa quyện vị thanh thoát quyến rũ của quả mọng"
     ],
-    "gallery": [],
-    "priceUnit": "chiếc"
+    "gallery": [
+      "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=85",
+      "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=85",
+      "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?auto=format&fit=crop&w=800&q=85"
+    ]
   }
 ];
 
