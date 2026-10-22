@@ -2,11 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Coffee, Heart, Gift, BookOpen, Send, ShoppingCart } from "lucide-react";
+import { Coffee, Heart, Gift, BookOpen, Send, ShoppingCart, Check, ArrowRight } from "lucide-react";
 import { INITIAL_PRODUCTS, Product, STORAGE_KEY } from "@/data/products";
+import { useCart } from "@/context/CartContext";
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
+  const { addToCart, setIsCartOpen } = useCart();
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -22,8 +25,35 @@ export default function Home() {
     }
   }, []);
 
+  const handleAddToCart = (flavor: Product) => {
+    addToCart(flavor, 1);
+    setToastMessage(`Đã thêm "${flavor.name}" vào giỏ hàng!`);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 4000);
+  };
+
   return (
     <>
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 bg-brand-choco text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-brand/30 animate-slideUp">
+          <div className="w-7 h-7 rounded-full bg-brand flex items-center justify-center shrink-0">
+            <Check size={16} className="text-white" />
+          </div>
+          <span className="text-sm font-medium">{toastMessage}</span>
+          <button
+            onClick={() => {
+              setToastMessage(null);
+              setIsCartOpen(true);
+            }}
+            className="ml-2 text-xs font-bold text-brand hover:underline flex items-center gap-1 bg-white/10 px-3 py-1.5 rounded-xl hover:bg-white/20 transition-colors"
+          >
+            Xem giỏ hàng <ArrowRight size={13} />
+          </button>
+        </div>
+      )}
+
       {/* Hero Section */}
       <section className="pt-8 pb-16 px-4 bg-[#FFFCF9]">
         <div className="container mx-auto max-w-6xl">
@@ -51,7 +81,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Bộ Sưu Tập 7 Vị Bánh (Hiển thị ảnh Canva sắc nét 100%) */}
+      {/* Bộ Sưu Tập 7 Vị Bánh */}
       <section id="flavors" className="py-20 px-4 bg-white">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
@@ -78,9 +108,9 @@ export default function Home() {
                       />
                       {/* Nút giỏ hàng nổi góc dưới */}
                       <button 
-                        className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur-md text-brand-choco hover:bg-brand hover:text-white flex items-center justify-center transition-all shadow-md group-hover:scale-110"
+                        className="absolute bottom-4 right-4 w-11 h-11 rounded-full bg-white/95 backdrop-blur-md text-brand-choco hover:bg-brand hover:text-white flex items-center justify-center transition-all shadow-lg group-hover:scale-110 active:scale-95"
                         title="Thêm vào giỏ hàng"
-                        onClick={() => alert(`Đã thêm "${flavor.name}" vào giỏ hàng!`)}
+                        onClick={() => handleAddToCart(flavor)}
                       >
                         <ShoppingCart size={18} />
                       </button>
@@ -96,13 +126,16 @@ export default function Home() {
                           {flavor.desc}
                         </p>
                       </div>
-                      <div className="flex justify-end">
+                      <div className="flex justify-between items-end">
+                        <span className="text-xs font-bold text-brand-choco/60">
+                          {flavor.price || "35.000đ"}
+                        </span>
                         <button 
                           className={`w-10 h-10 rounded-full flex items-center justify-center ${
                             flavor.textColor ? 'bg-white/20 text-white' : 'bg-white/50 text-brand-choco'
-                          } group-hover:scale-110 transition-transform`}
+                          } group-hover:scale-110 transition-transform active:scale-95 shadow-sm`}
                           title="Thêm vào giỏ hàng"
-                          onClick={() => alert(`Đã thêm "${flavor.name}" vào giỏ hàng!`)}
+                          onClick={() => handleAddToCart(flavor)}
                         >
                           <ShoppingCart size={18} />
                         </button>
